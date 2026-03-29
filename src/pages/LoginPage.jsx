@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Target, Mail, Lock, Eye, EyeOff, Github, Globe } from "lucide-react";
+import { Target, Mail, Lock, Eye, EyeOff, Globe } from "lucide-react";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -111,7 +111,7 @@ const LoginPage = () => {
               </span>
             </button>
             <button className="w-full flex items-center justify-center gap-3 border-2 border-slate-300 rounded-lg px-4 py-3 hover:border-primary-600 hover:bg-slate-50 transition-all duration-300 group">
-              <Github className="w-5 h-5 text-slate-600 group-hover:text-primary-600" />
+              <Globe className="w-5 h-5 text-slate-600 group-hover:text-primary-600" />
               <span className="font-semibold text-slate-700 group-hover:text-primary-600">
                 Continue with GitHub
               </span>

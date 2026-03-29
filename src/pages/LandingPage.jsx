@@ -96,8 +96,8 @@ const LandingPage = () => {
           <div className="mt-16 relative">
             <div className="bg-white rounded-2xl shadow-2xl p-8 border border-slate-200">
               <div
-                className="bg-gradient-to-br from-primary-50 to-blue-50 rounded-lg p-12"
-                style={{ minHeight: "500px" }}
+                className="bg-gradient-to-br from-primary-50 to-blue-50 rounded-lg p-8"
+                style={{ minHeight: "700px" }}
               >
                 <AgileWheelPreview />
               </div>

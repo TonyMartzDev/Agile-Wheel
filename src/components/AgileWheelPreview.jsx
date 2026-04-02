@@ -57,51 +57,49 @@ const AgileWheelPreview = () => {
     setIsAnimating(true);
   };
 
-  const createArrowSegment = (index, isActive) => {
+  const createArrowSegment = (index) => {
     const segmentAngle = 60;
     const startAngle = (index * segmentAngle - 90) * (Math.PI / 180);
     const endAngle = ((index + 1) * segmentAngle - 90) * (Math.PI / 180);
 
     const innerRadius = 38;
-    const outerRadius = isActive ? 95 : 90;
-    const arrowTipRadius = isActive ? 105 : 100;
+    const outerRadius = 90;
+    const midRadius = (innerRadius + outerRadius) / 2;
+    const arrowDepth = 12;
 
     const cx = 100;
     const cy = 100;
 
-    // Inner arc start
-    const innerStartX = cx + innerRadius * Math.cos(startAngle);
-    const innerStartY = cy + innerRadius * Math.sin(startAngle);
-
-    // Outer arc start
+    // Start side - arrow notch pointing inward (receives previous arrow)
     const outerStartX = cx + outerRadius * Math.cos(startAngle);
     const outerStartY = cy + outerRadius * Math.sin(startAngle);
 
-    // Arrow tip (at the end/middle of segment)
-    const arrowTipX = cx + arrowTipRadius * Math.cos(endAngle);
-    const arrowTipY = cy + arrowTipRadius * Math.sin(endAngle);
+    // Notch point on start side (indentation)
+    const startNotchX = cx + (midRadius + arrowDepth) * Math.cos(startAngle);
+    const startNotchY = cy + (midRadius + arrowDepth) * Math.sin(startAngle);
 
-    // Outer arc end (before arrow tip)
-    const outerEndX = cx + outerRadius * Math.cos(endAngle - 0.15);
-    const outerEndY = cy + outerRadius * Math.sin(endAngle - 0.15);
+    const innerStartX = cx + innerRadius * Math.cos(startAngle);
+    const innerStartY = cy + innerRadius * Math.sin(startAngle);
 
-    // Inner arc end
+    // End side - arrow tip pointing outward
+    const outerEndX = cx + outerRadius * Math.cos(endAngle);
+    const outerEndY = cy + outerRadius * Math.sin(endAngle);
+
+    // Arrow tip point on end side (protrusion)
+    const endTipX = cx + (midRadius - arrowDepth) * Math.cos(endAngle);
+    const endTipY = cy + (midRadius - arrowDepth) * Math.sin(endAngle);
+
     const innerEndX = cx + innerRadius * Math.cos(endAngle);
     const innerEndY = cy + innerRadius * Math.sin(endAngle);
 
-    // Arrow notch (inner part of arrow)
-    const notchRadius = outerRadius - 15;
-    const notchX = cx + notchRadius * Math.cos(endAngle);
-    const notchY = cy + notchRadius * Math.sin(endAngle);
-
     const pathData = `
-      M ${innerStartX} ${innerStartY}
-      L ${outerStartX} ${outerStartY}
-      A ${outerRadius} ${outerRadius} 0 0 1 ${outerEndX} ${outerEndY}
-      L ${arrowTipX} ${arrowTipY}
-      L ${notchX} ${notchY}
-      L ${innerEndX} ${innerEndY}
-      A ${innerRadius} ${innerRadius} 0 0 0 ${innerStartX} ${innerStartY}
+      M ${outerStartX} ${outerStartY}
+      L ${startNotchX} ${startNotchY}
+      L ${innerStartX} ${innerStartY}
+      A ${innerRadius} ${innerRadius} 0 0 1 ${innerEndX} ${innerEndY}
+      L ${endTipX} ${endTipY}
+      L ${outerEndX} ${outerEndY}
+      A ${outerRadius} ${outerRadius} 0 0 0 ${outerStartX} ${outerStartY}
       Z
     `;
 
@@ -134,7 +132,7 @@ const AgileWheelPreview = () => {
             return (
               <g key={index}>
                 <path
-                  d={createArrowSegment(index, isActive)}
+                  d={createArrowSegment(index)}
                   fill={phase.color}
                   opacity={isActive ? 1 : 0.85}
                   className="cursor-pointer transition-all duration-300"

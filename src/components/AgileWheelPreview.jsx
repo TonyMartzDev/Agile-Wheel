@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Target } from "lucide-react";
 
 const AgileWheelPreview = () => {
   const [activePhase, setActivePhase] = useState(0);
@@ -7,41 +6,36 @@ const AgileWheelPreview = () => {
 
   const phases = [
     {
-      name: "Planning",
+      name: "Plan",
       description:
         "Define project goals, create user stories, and plan sprints",
-      color: "#0ea5e9",
-      angle: 0,
+      color: "#7c3aed", // Dark purple
     },
     {
       name: "Design",
       description: "Create wireframes, mockups, and technical architecture",
-      color: "#3b82f6",
-      angle: 60,
+      color: "#dc2626", // Dark red
     },
     {
-      name: "Development",
+      name: "Develop",
       description: "Write code, implement features, and conduct code reviews",
-      color: "#6366f1",
-      angle: 120,
+      color: "#ea580c", // Dark orange
     },
     {
-      name: "Testing",
+      name: "Test",
       description: "Run automated tests, QA testing, and bug fixes",
-      color: "#8b5cf6",
-      angle: 180,
+      color: "#0d9488", // Dark teal
     },
     {
-      name: "Review",
-      description: "Sprint review, stakeholder feedback, and retrospectives",
-      color: "#a855f7",
-      angle: 240,
-    },
-    {
-      name: "Deploy",
+      name: "Release",
       description: "Release to production, monitor performance, and iterate",
-      color: "#0284c7",
-      angle: 300,
+      color: "#0369a1", // Dark blue
+    },
+    {
+      name: "Feedback",
+      description:
+        "Gather user feedback, analyze metrics, and plan improvements",
+      color: "#15803d", // Dark green
     },
   ];
 
@@ -63,96 +57,136 @@ const AgileWheelPreview = () => {
     setIsAnimating(true);
   };
 
+  const createArrowSegment = (index, isActive) => {
+    const segmentAngle = 60;
+    const startAngle = (index * segmentAngle - 90) * (Math.PI / 180);
+    const endAngle = ((index + 1) * segmentAngle - 90) * (Math.PI / 180);
+
+    const innerRadius = 38;
+    const outerRadius = isActive ? 95 : 90;
+    const arrowTipRadius = isActive ? 105 : 100;
+
+    const cx = 100;
+    const cy = 100;
+
+    // Inner arc start
+    const innerStartX = cx + innerRadius * Math.cos(startAngle);
+    const innerStartY = cy + innerRadius * Math.sin(startAngle);
+
+    // Outer arc start
+    const outerStartX = cx + outerRadius * Math.cos(startAngle);
+    const outerStartY = cy + outerRadius * Math.sin(startAngle);
+
+    // Arrow tip (at the end/middle of segment)
+    const arrowTipX = cx + arrowTipRadius * Math.cos(endAngle);
+    const arrowTipY = cy + arrowTipRadius * Math.sin(endAngle);
+
+    // Outer arc end (before arrow tip)
+    const outerEndX = cx + outerRadius * Math.cos(endAngle - 0.15);
+    const outerEndY = cy + outerRadius * Math.sin(endAngle - 0.15);
+
+    // Inner arc end
+    const innerEndX = cx + innerRadius * Math.cos(endAngle);
+    const innerEndY = cy + innerRadius * Math.sin(endAngle);
+
+    // Arrow notch (inner part of arrow)
+    const notchRadius = outerRadius - 15;
+    const notchX = cx + notchRadius * Math.cos(endAngle);
+    const notchY = cy + notchRadius * Math.sin(endAngle);
+
+    const pathData = `
+      M ${innerStartX} ${innerStartY}
+      L ${outerStartX} ${outerStartY}
+      A ${outerRadius} ${outerRadius} 0 0 1 ${outerEndX} ${outerEndY}
+      L ${arrowTipX} ${arrowTipY}
+      L ${notchX} ${notchY}
+      L ${innerEndX} ${innerEndY}
+      A ${innerRadius} ${innerRadius} 0 0 0 ${innerStartX} ${innerStartY}
+      Z
+    `;
+
+    return pathData;
+  };
+
+  const getTextPosition = (index) => {
+    const segmentAngle = 60;
+    const midAngle =
+      (index * segmentAngle + segmentAngle / 2 - 90) * (Math.PI / 180);
+    const textRadius = 65;
+
+    const x = 100 + textRadius * Math.cos(midAngle);
+    const y = 100 + textRadius * Math.sin(midAngle);
+    const rotation = index * segmentAngle + segmentAngle / 2;
+
+    return { x, y, rotation };
+  };
+
   return (
     <div className="relative w-full flex flex-col items-center justify-center py-8">
       {/* Wheel Container */}
       <div className="relative w-96 h-96 mb-8" onMouseLeave={handleMouseLeave}>
-        {/* Center Circle */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-primary-600 to-blue-600 rounded-full flex items-center justify-center shadow-xl z-10 transition-transform duration-300 hover:scale-110">
-          <Target
-            className="w-12 h-12 text-white animate-spin"
-            style={{ animationDuration: "8s" }}
-          />
-        </div>
-
-        {/* Wheel Segments */}
-        <svg
-          className="w-full h-full transform -rotate-90"
-          viewBox="0 0 200 200"
-        >
+        {/* Wheel SVG */}
+        <svg className="w-full h-full" viewBox="0 0 200 200">
+          {/* Arrow Segments */}
           {phases.map((phase, index) => {
             const isActive = activePhase === index;
-            const startAngle = index * 60 * (Math.PI / 180);
-            const endAngle = (index + 1) * 60 * (Math.PI / 180);
-            const innerRadius = 50;
-            const outerRadius = isActive ? 105 : 100;
-
-            const x1 = 100 + innerRadius * Math.cos(startAngle);
-            const y1 = 100 + innerRadius * Math.sin(startAngle);
-            const x2 = 100 + outerRadius * Math.cos(startAngle);
-            const y2 = 100 + outerRadius * Math.sin(startAngle);
-            const x3 = 100 + outerRadius * Math.cos(endAngle);
-            const y3 = 100 + outerRadius * Math.sin(endAngle);
-            const x4 = 100 + innerRadius * Math.cos(endAngle);
-            const y4 = 100 + innerRadius * Math.sin(endAngle);
-
-            const largeArcFlag = 0;
-
-            const pathData = `
-              M ${x1} ${y1}
-              L ${x2} ${y2}
-              A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x3} ${y3}
-              L ${x4} ${y4}
-              A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x1} ${y1}
-              Z
-            `;
 
             return (
               <g key={index}>
                 <path
-                  d={pathData}
+                  d={createArrowSegment(index, isActive)}
                   fill={phase.color}
-                  opacity={isActive ? 1 : 0.7}
+                  opacity={isActive ? 1 : 0.85}
                   className="cursor-pointer transition-all duration-300"
                   onMouseEnter={() => handlePhaseHover(index)}
                   style={{
                     filter: isActive
-                      ? "drop-shadow(0 4px 12px rgba(0,0,0,0.3))"
+                      ? "drop-shadow(0 4px 12px rgba(0,0,0,0.4))"
                       : "none",
-                    transform: isActive ? "scale(1.02)" : "scale(1)",
-                    transformOrigin: "100px 100px",
                   }}
                 />
+                {/* Text inside segment */}
+                <text
+                  x={getTextPosition(index).x}
+                  y={getTextPosition(index).y}
+                  fill="white"
+                  fontSize={isActive ? "9" : "8"}
+                  fontWeight="bold"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="pointer-events-none select-none transition-all duration-300"
+                  style={{
+                    textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+                  }}
+                  transform={`rotate(${getTextPosition(index).rotation}, ${getTextPosition(index).x}, ${getTextPosition(index).y})`}
+                >
+                  {phase.name}
+                </text>
               </g>
             );
           })}
+
+          {/* Center Circle */}
+          <circle
+            cx="100"
+            cy="100"
+            r="32"
+            fill="white"
+            className="drop-shadow-lg"
+          />
+          <text
+            x="100"
+            y="100"
+            fill="#1e293b"
+            fontSize="14"
+            fontWeight="bold"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="select-none"
+          >
+            AGILE
+          </text>
         </svg>
-
-        {/* Phase Labels */}
-        {phases.map((phase, index) => {
-          const angle = (index * 60 + 30) * (Math.PI / 180);
-          const radius = 165;
-          const x = 192 + radius * Math.cos(angle - Math.PI / 2);
-          const y = 192 + radius * Math.sin(angle - Math.PI / 2);
-          const isActive = activePhase === index;
-
-          return (
-            <div
-              key={`label-${index}`}
-              className="absolute text-base font-semibold transition-all duration-300 whitespace-nowrap"
-              style={{
-                left: `${x}px`,
-                top: `${y}px`,
-                transform: "translate(-50%, -50%)",
-                color: isActive ? phase.color : "#64748b",
-                fontSize: isActive ? "1.1rem" : "1rem",
-                fontWeight: isActive ? "700" : "600",
-              }}
-            >
-              {phase.name}
-            </div>
-          );
-        })}
       </div>
 
       {/* Phase Description Card */}

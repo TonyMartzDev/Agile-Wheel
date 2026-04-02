@@ -63,44 +63,43 @@ const AgileWheelPreview = () => {
     const endAngle = ((index + 1) * segmentAngle - 90) * (Math.PI / 180);
 
     const innerRadius = 38;
-    const outerRadius = 92;
-    const arrowDepth = 18;
+    const outerRadius = 90;
+    const midRadius = (innerRadius + outerRadius) / 2;
+    const arrowDepth = 12;
 
     const cx = 100;
     const cy = 100;
 
-    // Outer arrow tip - extends beyond outer radius at the END of segment
-    const outerTipRadius = outerRadius + arrowDepth;
-    const outerTipX = cx + outerTipRadius * Math.cos(endAngle);
-    const outerTipY = cy + outerTipRadius * Math.sin(endAngle);
+    // Start side - arrow notch pointing inward (receives previous arrow)
+    const outerStartX = cx + outerRadius * Math.cos(startAngle);
+    const outerStartY = cy + outerRadius * Math.sin(startAngle);
 
-    // Outer notch - indentation at the START of segment (receives previous arrow)
-    const outerNotchRadius = outerRadius - arrowDepth;
-    const outerNotchX = cx + outerNotchRadius * Math.cos(startAngle);
-    const outerNotchY = cy + outerNotchRadius * Math.sin(startAngle);
+    // Notch point on start side (indentation)
+    const startNotchX = cx + (midRadius + arrowDepth) * Math.cos(startAngle);
+    const startNotchY = cy + (midRadius + arrowDepth) * Math.sin(startAngle);
 
-    // Inner edge points
     const innerStartX = cx + innerRadius * Math.cos(startAngle);
     const innerStartY = cy + innerRadius * Math.sin(startAngle);
+
+    // End side - arrow tip pointing outward
+    const outerEndX = cx + outerRadius * Math.cos(endAngle);
+    const outerEndY = cy + outerRadius * Math.sin(endAngle);
+
+    // Arrow tip point on end side (protrusion)
+    const endTipX = cx + (midRadius - arrowDepth) * Math.cos(endAngle);
+    const endTipY = cy + (midRadius - arrowDepth) * Math.sin(endAngle);
+
     const innerEndX = cx + innerRadius * Math.cos(endAngle);
     const innerEndY = cy + innerRadius * Math.sin(endAngle);
 
-    // Points slightly before/after for arrow shape
-    const arrowOffset = 0.12;
-    const outerPreTipX = cx + outerRadius * Math.cos(endAngle - arrowOffset);
-    const outerPreTipY = cy + outerRadius * Math.sin(endAngle - arrowOffset);
-    const outerPostNotchX =
-      cx + outerRadius * Math.cos(startAngle + arrowOffset);
-    const outerPostNotchY =
-      cy + outerRadius * Math.sin(startAngle + arrowOffset);
-
     const pathData = `
-      M ${outerNotchX} ${outerNotchY}
-      L ${outerPostNotchX} ${outerPostNotchY}
-      A ${outerRadius} ${outerRadius} 0 0 1 ${outerPreTipX} ${outerPreTipY}
-      L ${outerTipX} ${outerTipY}
-      L ${innerEndX} ${innerEndY}
-      A ${innerRadius} ${innerRadius} 0 0 0 ${innerStartX} ${innerStartY}
+      M ${outerStartX} ${outerStartY}
+      L ${startNotchX} ${startNotchY}
+      L ${innerStartX} ${innerStartY}
+      A ${innerRadius} ${innerRadius} 0 0 1 ${innerEndX} ${innerEndY}
+      L ${endTipX} ${endTipY}
+      L ${outerEndX} ${outerEndY}
+      A ${outerRadius} ${outerRadius} 0 0 0 ${outerStartX} ${outerStartY}
       Z
     `;
 

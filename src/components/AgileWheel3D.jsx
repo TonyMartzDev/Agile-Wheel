@@ -188,9 +188,9 @@ export default function AgileWheel3D() {
       {/* Center Label */}
       <div
         className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-        style={{ marginTop: "-30px" }}
+        style={{ marginTop: "-20px" }}
       >
-        <span className="text-slate-800 font-bold text-2xl tracking-wider">
+        <span className="text-slate-900 font-black text-2xl tracking-widest drop-shadow-lg">
           AGILE
         </span>
       </div>

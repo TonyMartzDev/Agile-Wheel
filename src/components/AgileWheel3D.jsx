@@ -6,7 +6,7 @@ import {
   Environment,
   OrbitControls,
 } from "@react-three/drei";
-import { useSpring } from "@react-spring/three";
+import { useSpring, animated } from "@react-spring/three";
 import * as THREE from "three";
 
 const phases = [

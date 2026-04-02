@@ -94,13 +94,11 @@ const LandingPage = () => {
 
           {/* Interactive 3D Agile Wheel */}
           <div className="mt-16 relative">
-            <div className="bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
               <div
-                className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative"
-                style={{ minHeight: "700px" }}
+                className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg"
+                style={{ height: "600px" }}
               >
-                {/* Grid background */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
                 <AgileWheel3D />
               </div>
             </div>

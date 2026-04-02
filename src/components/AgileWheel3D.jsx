@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 
 const phases = [
   {
@@ -36,79 +37,102 @@ const phases = [
 
 function WheelSegment({ index, color, isActive, onHover, onLeave }) {
   const meshRef = useRef();
-  const segmentAngle = (Math.PI * 2) / 6;
-  const startAngle = index * segmentAngle;
-  const endAngle = (index + 1) * segmentAngle;
 
-  const innerRadius = 1.2;
-  const outerRadius = 2.2;
-  const depth = 0.3;
+  const geometry = useMemo(() => {
+    const segmentAngle = (Math.PI * 2) / 6;
+    const startAngle = index * segmentAngle;
+    const endAngle = (index + 1) * segmentAngle;
+    const innerRadius = 1.2;
+    const outerRadius = 2.2;
+    const midRadius = (innerRadius + outerRadius) / 2;
+    const arrowDepth = 0.2;
+
+    const shape = new THREE.Shape();
+    const arcSegments = 20;
+
+    // Start at outer edge
+    shape.moveTo(
+      Math.cos(startAngle) * outerRadius,
+      Math.sin(startAngle) * outerRadius,
+    );
+
+    // Arrow notch (concave indent on start side)
+    shape.lineTo(
+      Math.cos(startAngle) * (midRadius + arrowDepth),
+      Math.sin(startAngle) * (midRadius + arrowDepth),
+    );
+    shape.lineTo(
+      Math.cos(startAngle) * innerRadius,
+      Math.sin(startAngle) * innerRadius,
+    );
+
+    // Inner arc
+    for (let i = 1; i <= arcSegments; i++) {
+      const angle = startAngle + (endAngle - startAngle) * (i / arcSegments);
+      shape.lineTo(
+        Math.cos(angle) * innerRadius,
+        Math.sin(angle) * innerRadius,
+      );
+    }
+
+    // Arrow tip (convex point on end side)
+    shape.lineTo(
+      Math.cos(endAngle) * (midRadius - arrowDepth),
+      Math.sin(endAngle) * (midRadius - arrowDepth),
+    );
+    shape.lineTo(
+      Math.cos(endAngle) * outerRadius,
+      Math.sin(endAngle) * outerRadius,
+    );
+
+    // Outer arc (reverse)
+    for (let i = arcSegments - 1; i >= 0; i--) {
+      const angle = startAngle + (endAngle - startAngle) * (i / arcSegments);
+      shape.lineTo(
+        Math.cos(angle) * outerRadius,
+        Math.sin(angle) * outerRadius,
+      );
+    }
+
+    shape.closePath();
+
+    const extrudeSettings = {
+      steps: 1,
+      depth: 0.25,
+      bevelEnabled: true,
+      bevelThickness: 0.03,
+      bevelSize: 0.03,
+      bevelSegments: 2,
+    };
+
+    const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    geo.computeVertexNormals();
+    return geo;
+  }, [index]);
 
   useFrame(() => {
     if (meshRef.current) {
-      const targetZ = isActive ? 0.2 : 0;
+      const targetZ = isActive ? 0.3 : 0;
       meshRef.current.position.z +=
         (targetZ - meshRef.current.position.z) * 0.1;
     }
   });
 
-  // Create segment vertices for a simple ring segment
-  const vertices = [];
-  const indices = [];
-  const segments = 16;
-
-  for (let i = 0; i <= segments; i++) {
-    const angle = startAngle + (endAngle - startAngle) * (i / segments);
-    const cosA = Math.cos(angle);
-    const sinA = Math.sin(angle);
-
-    // Front face vertices (inner and outer)
-    vertices.push(cosA * innerRadius, sinA * innerRadius, depth / 2);
-    vertices.push(cosA * outerRadius, sinA * outerRadius, depth / 2);
-    // Back face vertices
-    vertices.push(cosA * innerRadius, sinA * innerRadius, -depth / 2);
-    vertices.push(cosA * outerRadius, sinA * outerRadius, -depth / 2);
-  }
-
-  // Create indices for triangles
-  for (let i = 0; i < segments; i++) {
-    const base = i * 4;
-    // Front face
-    indices.push(base, base + 1, base + 4);
-    indices.push(base + 1, base + 5, base + 4);
-    // Back face
-    indices.push(base + 2, base + 6, base + 3);
-    indices.push(base + 3, base + 6, base + 7);
-    // Outer edge
-    indices.push(base + 1, base + 3, base + 5);
-    indices.push(base + 3, base + 7, base + 5);
-    // Inner edge
-    indices.push(base, base + 4, base + 2);
-    indices.push(base + 2, base + 4, base + 6);
-  }
-
   return (
-    <mesh ref={meshRef} onPointerEnter={onHover} onPointerLeave={onLeave}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={vertices.length / 3}
-          array={new Float32Array(vertices)}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="index"
-          count={indices.length}
-          array={new Uint16Array(indices)}
-          itemSize={1}
-        />
-      </bufferGeometry>
+    <mesh
+      ref={meshRef}
+      geometry={geometry}
+      position={[0, 0, 0]}
+      onPointerEnter={onHover}
+      onPointerLeave={onLeave}
+    >
       <meshStandardMaterial
         color={color}
         emissive={color}
-        emissiveIntensity={isActive ? 0.4 : 0.15}
-        metalness={0.3}
-        roughness={0.5}
+        emissiveIntensity={isActive ? 0.5 : 0.2}
+        metalness={0.4}
+        roughness={0.3}
+        side={THREE.DoubleSide}
       />
     </mesh>
   );

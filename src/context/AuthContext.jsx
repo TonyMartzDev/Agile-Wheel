@@ -34,13 +34,13 @@ export const AuthProvider = ({ children }) => {
     return { success: true, user: userData };
   };
 
-  const signup = (email, name) => {
+  const signup = (email, name, role = "developer") => {
     // Temporary signup - create user in localStorage
     const userData = {
       id: crypto.randomUUID(),
       email,
       name: name || email.split("@")[0],
-      role: "developer",
+      role,
       createdAt: new Date().toISOString(),
     };
 

@@ -9,7 +9,7 @@ import {
   Shield,
   Clock,
 } from "lucide-react";
-import AgileWheel3D from "../components/AgileWheel3D";
+import AgileWheelPreview from "../components/AgileWheelPreview";
 
 const LandingPage = () => {
   return (
@@ -92,14 +92,14 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* Interactive 3D Agile Wheel */}
+          {/* Interactive Agile Wheel */}
           <div className="mt-16 relative">
-            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 border border-slate-200">
               <div
-                className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg"
-                style={{ height: "600px" }}
+                className="bg-gradient-to-br from-primary-50 to-blue-50 rounded-lg p-8"
+                style={{ minHeight: "700px" }}
               >
-                <AgileWheel3D />
+                <AgileWheelPreview />
               </div>
             </div>
           </div>

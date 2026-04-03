@@ -1,22 +1,49 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Target, Mail, Lock, Eye, EyeOff, Globe } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const { login, signup, isAuthenticated } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     name: "",
   });
 
+  // Redirect if already authenticated
+  if (isAuthenticated) {
+    navigate("/dashboard");
+    return null;
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setError("");
+
+    if (!formData.email) {
+      setError("Please enter your email");
+      return;
+    }
+
+    try {
+      if (isSignUp) {
+        signup(formData.email, formData.name);
+      } else {
+        login(formData.email);
+      }
+      navigate("/dashboard");
+    } catch {
+      setError("An error occurred. Please try again.");
+    }
   };
 
   const handleChange = (e) => {
+    setError("");
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -128,6 +155,13 @@ const LoginPage = () => {
               </span>
             </div>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+              {error}
+            </div>
+          )}
 
           {/* Email/Password Form */}
           <form onSubmit={handleSubmit} className="space-y-4">

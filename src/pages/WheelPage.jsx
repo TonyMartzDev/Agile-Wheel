@@ -257,46 +257,46 @@ const WheelPage = () => {
           </div>
         </div>
 
-        {/* The Wheel */}
-        <div className="relative flex flex-col items-center">
-          {/* Sprint Info Label */}
-          {activeSprint && (
-            <div className="absolute -top-16 left-1/2 -translate-x-1/2 text-center">
-              <p className="text-sm font-semibold text-slate-900">
-                {activeSprint.name}
-              </p>
-              <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
-                {Math.round(sprintProgress)}% Complete
-              </p>
-            </div>
-          )}
+        {/* Sprint Info Label - positioned above wheel */}
+        {activeSprint && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center z-10">
+            <p className="text-sm font-semibold text-slate-900">
+              {activeSprint.name}
+            </p>
+            <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+              {Math.round(sprintProgress)}% Complete
+            </p>
+          </div>
+        )}
 
+        {/* The Wheel */}
+        <div className="relative flex flex-col items-center mt-16">
           {/* Sprint Countdown Ring */}
           <svg
-            className="absolute -inset-8 w-[calc(100%+64px)] h-[calc(100%+64px)]"
-            viewBox="0 0 232 232"
+            className="absolute -inset-10 w-[calc(100%+80px)] h-[calc(100%+80px)]"
+            viewBox="0 0 240 240"
           >
             {/* Background ring */}
             <circle
-              cx="116"
-              cy="116"
-              r="112"
+              cx="120"
+              cy="120"
+              r="116"
               fill="none"
               stroke="#e2e8f0"
               strokeWidth="6"
             />
             {/* Progress ring */}
             <circle
-              cx="116"
-              cy="116"
-              r="112"
+              cx="120"
+              cy="120"
+              r="116"
               fill="none"
               stroke="url(#sprintGradient)"
               strokeWidth="6"
               strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 112}`}
-              strokeDashoffset={`${2 * Math.PI * 112 * (1 - sprintProgress / 100)}`}
-              transform="rotate(-90 116 116)"
+              strokeDasharray={`${2 * Math.PI * 116}`}
+              strokeDashoffset={`${2 * Math.PI * 116 * (1 - sprintProgress / 100)}`}
+              transform="rotate(-90 120 120)"
               className="transition-all duration-1000"
             />
             <defs>
@@ -313,9 +313,9 @@ const WheelPage = () => {
             </defs>
           </svg>
 
-          {/* Wheel Container - 40% of viewport width, max 500px */}
+          {/* Wheel Container - 80% of viewport width for prominence */}
           <div
-            className="relative w-[40vw] max-w-[500px] min-w-[350px] aspect-square"
+            className="relative w-[70vw] max-w-[700px] min-w-[450px] aspect-square"
             onMouseLeave={() => setHoveredPhase(null)}
           >
             <svg className="w-full h-full" viewBox="0 0 200 200">

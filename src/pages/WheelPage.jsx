@@ -257,17 +257,15 @@ const WheelPage = () => {
           </div>
         </div>
 
-        {/* Sprint Info Label - positioned above wheel */}
-        {activeSprint && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center z-10">
-            <p className="text-sm font-semibold text-slate-900">
-              {activeSprint.name}
-            </p>
-            <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
-              {Math.round(sprintProgress)}% Complete
-            </p>
-          </div>
-        )}
+        {/* Project Name - positioned above wheel */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center z-10">
+          <h1 className="text-3xl font-bold text-slate-900">
+            {currentProject?.name || "Project"}
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            {currentProject?.description}
+          </p>
+        </div>
 
         {/* The Wheel */}
         <div className="relative flex flex-col items-center mt-16">
@@ -426,31 +424,46 @@ const WheelPage = () => {
                 strokeWidth="2"
                 className="drop-shadow-sm"
               />
-              <text
-                x="100"
-                y="96"
-                fill="#1e293b"
-                fontSize="7"
-                fontWeight="bold"
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="select-none"
-              >
-                {(currentProject?.name || "Project").length > 12
-                  ? (currentProject?.name || "Project").substring(0, 12) + "..."
-                  : currentProject?.name || "Project"}
-              </text>
-              <text
-                x="100"
-                y="106"
-                fill="#64748b"
-                fontSize="5"
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="select-none"
-              >
-                {phases[currentPhaseIndex].name} Phase
-              </text>
+              {activeSprint && (
+                <>
+                  <text
+                    x="100"
+                    y="96"
+                    fill="#1e293b"
+                    fontSize="6"
+                    fontWeight="600"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    className="select-none"
+                  >
+                    {activeSprint.name}
+                  </text>
+                  <text
+                    x="100"
+                    y="106"
+                    fill="url(#centerGradient)"
+                    fontSize="9"
+                    fontWeight="bold"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    className="select-none"
+                  >
+                    {Math.round(sprintProgress)}%
+                  </text>
+                </>
+              )}
+              <defs>
+                <linearGradient
+                  id="centerGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
+                >
+                  <stop offset="0%" stopColor="#8b5cf6" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+              </defs>
             </svg>
 
             {/* Team Presence Avatars */}

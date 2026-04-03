@@ -258,12 +258,15 @@ const WheelPage = () => {
         </div>
 
         {/* Project Name - positioned above wheel */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center z-10">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center z-10 max-w-2xl px-4">
           <h1 className="text-3xl font-bold text-slate-900">
             {currentProject?.name || "Project"}
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            {currentProject?.description}
+          <p className="text-sm text-slate-600 mt-2 italic">
+            "
+            {currentProject?.vision ||
+              "Define your project vision to keep the team focused"}
+            "
           </p>
         </div>
 

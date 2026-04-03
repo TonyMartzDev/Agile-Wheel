@@ -15,6 +15,8 @@ const getStoredProjects = () => {
       id: "1",
       name: "E-Commerce Platform",
       description: "Building a modern e-commerce solution",
+      vision:
+        "Empower small businesses to compete globally by providing an affordable, feature-rich online storefront",
       phase: "Develop",
       progress: 65,
       team: [

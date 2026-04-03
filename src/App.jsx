@@ -4,6 +4,7 @@ import { ProjectProvider } from "./context/ProjectContext";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
+import WheelPage from "./pages/WheelPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -19,6 +20,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wheel"
+              element={
+                <ProtectedRoute>
+                  <WheelPage />
                 </ProtectedRoute>
               }
             />

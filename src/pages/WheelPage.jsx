@@ -144,13 +144,13 @@ const WheelPage = () => {
   const displayIssues = getPhaseIssues(displayPhase.id);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex">
+    <div className="min-h-screen bg-slate-50 flex">
       {/* Issues Sidebar */}
-      <div className="w-80 bg-slate-800/50 backdrop-blur-sm border-r border-slate-700 p-6 flex flex-col">
+      <div className="w-80 bg-white border-r border-slate-200 p-6 flex flex-col shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <Link
             to="/dashboard"
-            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="text-sm font-medium">Back to Dashboard</span>
@@ -164,11 +164,11 @@ const WheelPage = () => {
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: displayPhase.color }}
             />
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               {displayPhase.name} Issues
             </h2>
           </div>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-500">
             {hoveredPhase !== null ? "Preview" : "Current phase"}
           </p>
         </div>
@@ -179,14 +179,14 @@ const WheelPage = () => {
             displayIssues.map((issue) => (
               <div
                 key={issue.id}
-                className="bg-slate-700/50 rounded-lg p-4 border border-slate-600 hover:border-slate-500 transition-colors"
+                className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all"
               >
                 <div className="flex items-start gap-3">
                   <div
                     className={`w-2 h-2 rounded-full mt-2 ${priorityColors[issue.priority]?.dot || "bg-slate-400"}`}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-white text-sm truncate">
+                    <p className="font-medium text-slate-900 text-sm truncate">
                       {issue.title}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
@@ -196,7 +196,7 @@ const WheelPage = () => {
                         {issue.priority}
                       </span>
                       {issue.assignee && (
-                        <span className="text-xs text-slate-400 truncate">
+                        <span className="text-xs text-slate-500 truncate">
                           {issue.assignee}
                         </span>
                       )}
@@ -207,22 +207,22 @@ const WheelPage = () => {
             ))
           ) : (
             <div className="text-center py-8">
-              <CheckCircle2 className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-              <p className="text-slate-500 text-sm">No issues in this phase</p>
+              <CheckCircle2 className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+              <p className="text-slate-400 text-sm">No issues in this phase</p>
             </div>
           )}
         </div>
 
         {/* Sprint Info */}
         {activeSprint && (
-          <div className="mt-4 pt-4 border-t border-slate-700">
+          <div className="mt-4 pt-4 border-t border-slate-200">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-slate-400">{activeSprint.name}</span>
-              <span className="text-white font-medium">
+              <span className="text-slate-600">{activeSprint.name}</span>
+              <span className="text-slate-900 font-medium">
                 {Math.round(sprintProgress)}% complete
               </span>
             </div>
-            <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-500"
                 style={{ width: `${sprintProgress}%` }}
@@ -236,10 +236,10 @@ const WheelPage = () => {
       <div className="flex-1 flex items-center justify-center relative p-8">
         {/* Project Title */}
         <div className="absolute top-6 left-6">
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-slate-900">
             {currentProject?.name || "Project"}
           </h1>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-500 text-sm">
             {currentProject?.description}
           </p>
         </div>
@@ -247,8 +247,8 @@ const WheelPage = () => {
         {/* User Info */}
         <div className="absolute top-6 right-6 flex items-center gap-3">
           <div className="text-right">
-            <p className="text-sm font-medium text-white">{user?.name}</p>
-            <p className="text-xs text-slate-400">
+            <p className="text-sm font-medium text-slate-900">{user?.name}</p>
+            <p className="text-xs text-slate-500">
               {user?.role?.replace("_", " ")}
             </p>
           </div>
@@ -258,33 +258,45 @@ const WheelPage = () => {
         </div>
 
         {/* The Wheel */}
-        <div className="relative">
+        <div className="relative flex flex-col items-center">
+          {/* Sprint Info Label */}
+          {activeSprint && (
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 text-center">
+              <p className="text-sm font-semibold text-slate-900">
+                {activeSprint.name}
+              </p>
+              <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+                {Math.round(sprintProgress)}% Complete
+              </p>
+            </div>
+          )}
+
           {/* Sprint Countdown Ring */}
           <svg
-            className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)]"
-            viewBox="0 0 224 224"
+            className="absolute -inset-8 w-[calc(100%+64px)] h-[calc(100%+64px)]"
+            viewBox="0 0 232 232"
           >
             {/* Background ring */}
             <circle
-              cx="112"
-              cy="112"
-              r="108"
+              cx="116"
+              cy="116"
+              r="112"
               fill="none"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="4"
+              stroke="#e2e8f0"
+              strokeWidth="6"
             />
             {/* Progress ring */}
             <circle
-              cx="112"
-              cy="112"
-              r="108"
+              cx="116"
+              cy="116"
+              r="112"
               fill="none"
               stroke="url(#sprintGradient)"
-              strokeWidth="4"
+              strokeWidth="6"
               strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 108}`}
-              strokeDashoffset={`${2 * Math.PI * 108 * (1 - sprintProgress / 100)}`}
-              transform="rotate(-90 112 112)"
+              strokeDasharray={`${2 * Math.PI * 112}`}
+              strokeDashoffset={`${2 * Math.PI * 112 * (1 - sprintProgress / 100)}`}
+              transform="rotate(-90 116 116)"
               className="transition-all duration-1000"
             />
             <defs>
@@ -301,9 +313,9 @@ const WheelPage = () => {
             </defs>
           </svg>
 
-          {/* Wheel Container */}
+          {/* Wheel Container - 40% of viewport width, max 500px */}
           <div
-            className="relative w-[400px] h-[400px]"
+            className="relative w-[40vw] max-w-[500px] min-w-[350px] aspect-square"
             onMouseLeave={() => setHoveredPhase(null)}
           >
             <svg className="w-full h-full" viewBox="0 0 200 200">
@@ -409,21 +421,35 @@ const WheelPage = () => {
                 cx="100"
                 cy="100"
                 r="32"
-                fill="#1e293b"
-                stroke="rgba(255,255,255,0.1)"
+                fill="white"
+                stroke="#e2e8f0"
                 strokeWidth="2"
+                className="drop-shadow-sm"
               />
               <text
                 x="100"
-                y="100"
-                fill="white"
-                fontSize="12"
+                y="96"
+                fill="#1e293b"
+                fontSize="7"
                 fontWeight="bold"
                 textAnchor="middle"
                 dominantBaseline="middle"
                 className="select-none"
               >
-                AGILE
+                {(currentProject?.name || "Project").length > 12
+                  ? (currentProject?.name || "Project").substring(0, 12) + "..."
+                  : currentProject?.name || "Project"}
+              </text>
+              <text
+                x="100"
+                y="106"
+                fill="#64748b"
+                fontSize="5"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="select-none"
+              >
+                {phases[currentPhaseIndex].name} Phase
               </text>
             </svg>
 
@@ -451,14 +477,14 @@ const WheelPage = () => {
                   {teamMembers.slice(0, 3).map((member) => (
                     <div
                       key={member.id}
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white text-xs font-semibold border-2 border-slate-800 shadow-lg"
+                      className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white text-xs font-semibold border-2 border-white shadow-lg"
                       title={member.name}
                     >
                       {member.name.charAt(0)}
                     </div>
                   ))}
                   {teamMembers.length > 3 && (
-                    <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white text-xs font-semibold border-2 border-slate-800">
+                    <div className="w-8 h-8 rounded-full bg-slate-500 flex items-center justify-center text-white text-xs font-semibold border-2 border-white shadow-lg">
                       +{teamMembers.length - 3}
                     </div>
                   )}
@@ -471,7 +497,7 @@ const WheelPage = () => {
         {/* Phase Description Tooltip */}
         {hoveredPhase !== null && (
           <div
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-2xl max-w-sm"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white rounded-xl p-4 border-2 shadow-xl max-w-sm"
             style={{ borderColor: phases[hoveredPhase].color }}
           >
             <div className="flex items-center gap-2 mb-2">
@@ -479,16 +505,16 @@ const WheelPage = () => {
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: phases[hoveredPhase].color }}
               />
-              <h3 className="font-bold text-white">
+              <h3 className="font-bold text-slate-900">
                 {phases[hoveredPhase].name}
               </h3>
               {!phases[hoveredPhase].isActive && (
-                <span className="text-xs bg-slate-700 text-slate-400 px-2 py-0.5 rounded">
+                <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded">
                   Coming Soon
                 </span>
               )}
             </div>
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-600 text-sm">
               {phases[hoveredPhase].description}
             </p>
           </div>
@@ -602,29 +628,27 @@ const TeamMemberModal = ({ phase, members, tasks, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md border-2"
+        style={{ borderColor: phase.color }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className="p-5 border-b border-slate-700 flex items-center justify-between"
-          style={{ borderBottomColor: phase.color }}
-        >
+        <div className="p-5 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
               className="w-4 h-4 rounded-full"
               style={{ backgroundColor: phase.color }}
             />
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               Team in {phase.name}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-white transition-colors"
+            className="p-1 text-slate-400 hover:text-slate-900 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -635,14 +659,19 @@ const TeamMemberModal = ({ phase, members, tasks, onClose }) => {
             const memberTasks = getMemberTasks(member.name);
 
             return (
-              <div key={member.id} className="bg-slate-700/50 rounded-xl p-4">
+              <div
+                key={member.id}
+                className="bg-slate-50 rounded-xl p-4 border border-slate-200"
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white font-semibold">
                     {member.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-semibold text-white">{member.name}</p>
-                    <p className="text-xs text-slate-400 capitalize">
+                    <p className="font-semibold text-slate-900">
+                      {member.name}
+                    </p>
+                    <p className="text-xs text-slate-500 capitalize">
                       {member.role?.replace("_", " ")}
                     </p>
                   </div>
@@ -650,7 +679,7 @@ const TeamMemberModal = ({ phase, members, tasks, onClose }) => {
 
                 {memberTasks.length > 0 ? (
                   <div className="space-y-2">
-                    <p className="text-xs text-slate-500 uppercase tracking-wide">
+                    <p className="text-xs text-slate-400 uppercase tracking-wide">
                       Working on:
                     </p>
                     {memberTasks.map((task) => (
@@ -661,14 +690,14 @@ const TeamMemberModal = ({ phase, members, tasks, onClose }) => {
                         <div
                           className={`w-1.5 h-1.5 rounded-full ${priorityColors[task.priority]?.dot || "bg-slate-400"}`}
                         />
-                        <span className="text-slate-300 truncate">
+                        <span className="text-slate-700 truncate">
                           {task.title}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500 italic">
+                  <p className="text-sm text-slate-400 italic">
                     No active tasks
                   </p>
                 )}

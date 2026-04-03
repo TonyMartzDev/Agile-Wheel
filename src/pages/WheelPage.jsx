@@ -313,9 +313,9 @@ const WheelPage = () => {
             </defs>
           </svg>
 
-          {/* Wheel Container - 80% of viewport width for prominence */}
+          {/* Wheel Container - 50% larger than before */}
           <div
-            className="relative w-[70vw] max-w-[700px] min-w-[450px] aspect-square"
+            className="relative w-[85vw] max-w-[900px] min-w-[600px] aspect-square"
             onMouseLeave={() => setHoveredPhase(null)}
           >
             <svg className="w-full h-full" viewBox="0 0 200 200">

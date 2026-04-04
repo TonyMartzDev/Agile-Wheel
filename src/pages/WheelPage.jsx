@@ -303,10 +303,11 @@ const WheelPage = () => {
             <defs>
               <linearGradient
                 id="sprintGradient"
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="0%"
+                gradientUnits="userSpaceOnUse"
+                x1="120"
+                y1="4"
+                x2="120"
+                y2="236"
               >
                 <stop offset="0%" stopColor="#86efac" />
                 <stop offset="50%" stopColor="#22c55e" />

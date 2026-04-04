@@ -286,34 +286,52 @@ const WheelPage = () => {
               stroke="#e2e8f0"
               strokeWidth="6"
             />
-            {/* Progress ring */}
+            {/* Progress ring with multiple segments for gradient effect */}
+            {/* Light green segment (0-33%) */}
             <circle
               cx="120"
               cy="120"
               r="116"
               fill="none"
-              stroke="url(#sprintGradient)"
+              stroke="#86efac"
               strokeWidth="6"
               strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 116}`}
-              strokeDashoffset={`${2 * Math.PI * 116 * (1 - sprintProgress / 100)}`}
+              strokeDasharray={`${2 * Math.PI * 116 * 0.33} ${2 * Math.PI * 116 * 0.67}`}
+              strokeDashoffset={`${2 * Math.PI * 116 * (1 - Math.min(sprintProgress / 33, 1))}`}
               transform="rotate(-90 120 120)"
               className="transition-all duration-1000"
+              opacity={sprintProgress > 0 ? 1 : 0}
             />
-            <defs>
-              <linearGradient
-                id="sprintGradient"
-                gradientUnits="userSpaceOnUse"
-                x1="120"
-                y1="4"
-                x2="120"
-                y2="236"
-              >
-                <stop offset="0%" stopColor="#86efac" />
-                <stop offset="50%" stopColor="#22c55e" />
-                <stop offset="100%" stopColor="#15803d" />
-              </linearGradient>
-            </defs>
+            {/* Medium green segment (33-66%) */}
+            <circle
+              cx="120"
+              cy="120"
+              r="116"
+              fill="none"
+              stroke="#22c55e"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * 116 * 0.33} ${2 * Math.PI * 116 * 0.67}`}
+              strokeDashoffset={`${2 * Math.PI * 116 * (1.33 - Math.min(sprintProgress / 33, 2))}`}
+              transform="rotate(-90 120 120)"
+              className="transition-all duration-1000"
+              opacity={sprintProgress > 33 ? 1 : 0}
+            />
+            {/* Dark green segment (66-100%) */}
+            <circle
+              cx="120"
+              cy="120"
+              r="116"
+              fill="none"
+              stroke="#15803d"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * 116 * 0.34} ${2 * Math.PI * 116 * 0.66}`}
+              strokeDashoffset={`${2 * Math.PI * 116 * (1.66 - Math.min(sprintProgress / 33, 3))}`}
+              transform="rotate(-90 120 120)"
+              className="transition-all duration-1000"
+              opacity={sprintProgress > 66 ? 1 : 0}
+            />
           </svg>
 
           {/* Wheel Container - 50% larger than before */}

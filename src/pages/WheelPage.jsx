@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, X, CheckCircle2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../context/ProjectContext";
@@ -79,6 +79,7 @@ const priorityColors = {
 const WheelPage = () => {
   const { user } = useAuth();
   const { projects } = useProjects();
+  const navigate = useNavigate();
   const [hoveredPhase, setHoveredPhase] = useState(null);
   const [selectedTeamMember, setSelectedTeamMember] = useState(null);
   const [pulseAnimation] = useState(true);
@@ -385,6 +386,11 @@ const WheelPage = () => {
                       opacity={isLocked ? 0.4 : isHovered ? 1 : 0.85}
                       className={`transition-all duration-300 ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}
                       onMouseEnter={() => !isLocked && setHoveredPhase(index)}
+                      onClick={() => {
+                        if (!isLocked && phase.id === "plan") {
+                          navigate("/planning");
+                        }
+                      }}
                       filter={
                         isCurrentPhase && pulseAnimation
                           ? "url(#pulseGlow)"

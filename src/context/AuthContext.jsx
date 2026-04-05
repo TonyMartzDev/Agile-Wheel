@@ -21,11 +21,21 @@ export const AuthProvider = ({ children }) => {
   const login = (email) => {
     // Temporary login - accept any email/password combo
     // In production, this would validate against a backend
+
+    // Check if user already exists in localStorage
+    const existingUser = getStoredUser();
+    if (existingUser && existingUser.email === email) {
+      // User exists, use their existing data including role
+      setUser(existingUser);
+      return { success: true, user: existingUser };
+    }
+
+    // New user - create with default role
     const userData = {
       id: crypto.randomUUID(),
       email,
       name: email.split("@")[0],
-      role: "developer", // Default role
+      role: "developer", // Default role for new users
       createdAt: new Date().toISOString(),
     };
 

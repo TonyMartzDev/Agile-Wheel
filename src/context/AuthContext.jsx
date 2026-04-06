@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getStoredUser);
 
   const login = (email) => {
-    // Temporary login - accept any email/password combo
+    // Login only works for existing accounts
     // In production, this would validate against a backend
 
     // Check if user already exists in localStorage
@@ -30,18 +30,11 @@ export const AuthProvider = ({ children }) => {
       return { success: true, user: existingUser };
     }
 
-    // New user - create with default role
-    const userData = {
-      id: crypto.randomUUID(),
-      email,
-      name: email.split("@")[0],
-      role: "developer", // Default role for new users
-      createdAt: new Date().toISOString(),
+    // Account doesn't exist - user needs to sign up
+    return {
+      success: false,
+      error: "Account not found. Please sign up to create a new account.",
     };
-
-    localStorage.setItem("agilewheel_user", JSON.stringify(userData));
-    setUser(userData);
-    return { success: true, user: userData };
   };
 
   const signup = (email, name, role = "developer") => {

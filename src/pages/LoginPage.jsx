@@ -90,8 +90,12 @@ const LoginPage = () => {
       setSignupStep(2);
     } else {
       try {
-        login(formData.email);
-        navigate("/dashboard");
+        const result = login(formData.email);
+        if (result.success) {
+          navigate("/dashboard");
+        } else {
+          setError(result.error || "Login failed. Please try again.");
+        }
       } catch {
         setError("An error occurred. Please try again.");
       }

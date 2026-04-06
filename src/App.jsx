@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import WheelPage from "./pages/WheelPage";
 import PlanningPhasePage from "./pages/PlanningPhasePage";
+import SettingsPage from "./pages/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ChatWindow from "./components/ChatWindow";
 
@@ -40,6 +41,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <PlanningPhasePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <SettingsPage />
                   </ProtectedRoute>
                 }
               />

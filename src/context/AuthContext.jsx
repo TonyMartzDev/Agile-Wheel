@@ -72,6 +72,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (updates) => {
+    if (user) {
+      const updatedUser = { ...user, ...updates };
+      localStorage.setItem("agilewheel_user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      return true;
+    }
+    return false;
+  };
+
+  const deleteAccount = () => {
+    if (user) {
+      // Remove user data
+      localStorage.removeItem("agilewheel_user");
+
+      // Remove user's personal chats
+      localStorage.removeItem(`agilewheel_personal_chats_${user.id}`);
+
+      // Note: Team chats are shared and should remain for other team members
+      // In production, backend would handle removing user from team chats
+
+      setUser(null);
+      return true;
+    }
+    return false;
+  };
+
   const value = {
     user,
     isAuthenticated: !!user,
@@ -79,6 +106,8 @@ export const AuthProvider = ({ children }) => {
     signup,
     logout,
     updateUserRole,
+    updateUser,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

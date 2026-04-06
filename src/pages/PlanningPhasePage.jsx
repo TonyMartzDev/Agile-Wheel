@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../context/ProjectContext";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Settings } from "lucide-react";
 
 // Import role-specific workspaces
 import POPlanningWorkspace from "../components/planning/POPlanningWorkspace";
@@ -225,6 +225,13 @@ const PlanningPhasePage = () => {
             </div>
 
             <div className="flex items-center gap-3">
+              <Link
+                to="/settings"
+                className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                title="Settings"
+              >
+                <Settings className="w-5 h-5" />
+              </Link>
               <div className="text-right">
                 <p className="text-sm font-medium text-slate-900">
                   {user?.name}

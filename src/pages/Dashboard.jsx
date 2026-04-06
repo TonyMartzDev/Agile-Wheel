@@ -73,9 +73,13 @@ const Dashboard = () => {
               <button className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
                 <Bell className="w-5 h-5" />
               </button>
-              <button className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+              <Link
+                to="/settings"
+                className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                title="Settings"
+              >
                 <Settings className="w-5 h-5" />
-              </button>
+              </Link>
               <div className="h-8 w-px bg-slate-200" />
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-gradient-to-br from-primary-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">

@@ -96,19 +96,20 @@ const WheelPage = () => {
     ? calculateSprintProgress(activeSprint)
     : 0;
 
-  // Calculate smooth gradient color based on progress (light green to dark green)
+  // Calculate smooth gradient color using HSL for better shade transitions
   const getProgressColor = (progress) => {
-    // Light green: #86efac (rgb 134, 239, 172)
-    // Dark green: #15803d (rgb 21, 128, 61)
-    const lightGreen = { r: 134, g: 239, b: 172 };
-    const darkGreen = { r: 21, g: 128, b: 61 };
+    // Green hue: 142 (matches Tailwind green-400 to green-800 range)
+    // Saturation: 76% (vibrant green)
+    // Lightness: Start at 80% (light green) and decrease to 35% (dark green)
+    const hue = 142;
+    const saturation = 76;
+    const startLightness = 80;
+    const endLightness = 35;
 
-    const ratio = progress / 100;
-    const r = Math.round(lightGreen.r + (darkGreen.r - lightGreen.r) * ratio);
-    const g = Math.round(lightGreen.g + (darkGreen.g - lightGreen.g) * ratio);
-    const b = Math.round(lightGreen.b + (darkGreen.b - lightGreen.b) * ratio);
+    const currentLightness =
+      startLightness - (progress / 100) * (startLightness - endLightness);
 
-    return `rgb(${r}, ${g}, ${b})`;
+    return `hsl(${hue}, ${saturation}%, ${currentLightness}%)`;
   };
 
   const progressColor = getProgressColor(sprintProgress);

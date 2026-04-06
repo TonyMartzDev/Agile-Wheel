@@ -96,6 +96,23 @@ const WheelPage = () => {
     ? calculateSprintProgress(activeSprint)
     : 0;
 
+  // Calculate smooth gradient color based on progress (light green to dark green)
+  const getProgressColor = (progress) => {
+    // Light green: #86efac (rgb 134, 239, 172)
+    // Dark green: #15803d (rgb 21, 128, 61)
+    const lightGreen = { r: 134, g: 239, b: 172 };
+    const darkGreen = { r: 21, g: 128, b: 61 };
+
+    const ratio = progress / 100;
+    const r = Math.round(lightGreen.r + (darkGreen.r - lightGreen.r) * ratio);
+    const g = Math.round(lightGreen.g + (darkGreen.g - lightGreen.g) * ratio);
+    const b = Math.round(lightGreen.b + (darkGreen.b - lightGreen.b) * ratio);
+
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  const progressColor = getProgressColor(sprintProgress);
+
   // Get issues/tasks for each phase
   const getPhaseIssues = (phaseId) => {
     if (!currentProject) return [];
@@ -287,51 +304,23 @@ const WheelPage = () => {
               stroke="#e2e8f0"
               strokeWidth="6"
             />
-            {/* Progress ring with multiple segments for gradient effect */}
-            {/* Light green segment (0-33%) */}
+            {/* Progress ring with smooth gradient from light to dark green */}
             <circle
               cx="120"
               cy="120"
               r="116"
               fill="none"
-              stroke="#86efac"
+              stroke={progressColor}
               strokeWidth="6"
               strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 116 * 0.33} ${2 * Math.PI * 116 * 0.67}`}
-              strokeDashoffset={`${2 * Math.PI * 116 * (1 - Math.min(sprintProgress / 33, 1))}`}
+              strokeDasharray={`${2 * Math.PI * 116}`}
+              strokeDashoffset={`${2 * Math.PI * 116 * (1 - sprintProgress / 100)}`}
               transform="rotate(-90 120 120)"
               className="transition-all duration-1000"
-              opacity={sprintProgress > 0 ? 1 : 0}
-            />
-            {/* Medium green segment (33-66%) */}
-            <circle
-              cx="120"
-              cy="120"
-              r="116"
-              fill="none"
-              stroke="#22c55e"
-              strokeWidth="6"
-              strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 116 * 0.33} ${2 * Math.PI * 116 * 0.67}`}
-              strokeDashoffset={`${2 * Math.PI * 116 * (1.33 - Math.min(sprintProgress / 33, 2))}`}
-              transform="rotate(-90 120 120)"
-              className="transition-all duration-1000"
-              opacity={sprintProgress > 33 ? 1 : 0}
-            />
-            {/* Dark green segment (66-100%) */}
-            <circle
-              cx="120"
-              cy="120"
-              r="116"
-              fill="none"
-              stroke="#15803d"
-              strokeWidth="6"
-              strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 116 * 0.34} ${2 * Math.PI * 116 * 0.66}`}
-              strokeDashoffset={`${2 * Math.PI * 116 * (1.66 - Math.min(sprintProgress / 33, 3))}`}
-              transform="rotate(-90 120 120)"
-              className="transition-all duration-1000"
-              opacity={sprintProgress > 66 ? 1 : 0}
+              style={{
+                transition:
+                  "stroke 1s ease-in-out, stroke-dashoffset 1s ease-in-out",
+              }}
             />
           </svg>
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, X, CheckCircle2, Settings } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../context/ProjectContext";
@@ -80,13 +80,27 @@ const WheelPage = () => {
   const { user } = useAuth();
   const { projects } = useProjects();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [hoveredPhase, setHoveredPhase] = useState(null);
   const [selectedTeamMember, setSelectedTeamMember] = useState(null);
   const [pulseAnimation] = useState(true);
 
-  // Get current project (first one for demo)
-  const currentProject = projects[0];
-  const currentPhaseIndex = 0; // Planning phase for MVP
+  // Get project from URL params or default to first project
+  const projectId = searchParams.get("project");
+  const currentProject = projectId
+    ? projects.find((p) => p.id === projectId) || projects[0]
+    : projects[0];
+
+  // Map project phase to phase index
+  const phaseMap = {
+    Plan: 0,
+    Design: 1,
+    Develop: 2,
+    Test: 3,
+    Release: 4,
+    Feedback: 5,
+  };
+  const currentPhaseIndex = phaseMap[currentProject?.phase] || 0;
 
   // Sprint progress calculation
   const activeSprint = currentProject?.sprints?.find(
@@ -95,6 +109,9 @@ const WheelPage = () => {
   const sprintProgress = activeSprint
     ? calculateSprintProgress(activeSprint)
     : 0;
+
+  // Use project progress for the outer ring, sprint progress for sprint info
+  const projectProgress = currentProject?.progress || 0;
 
   // Calculate smooth gradient color using HSL for better shade transitions
   const getProgressColor = (progress) => {
@@ -112,7 +129,7 @@ const WheelPage = () => {
     return `hsl(${hue}, ${saturation}%, ${currentLightness}%)`;
   };
 
-  const progressColor = getProgressColor(sprintProgress);
+  const progressColor = getProgressColor(projectProgress);
 
   // Get issues/tasks for each phase
   const getPhaseIssues = (phaseId) => {
@@ -322,7 +339,7 @@ const WheelPage = () => {
               strokeWidth="6"
               strokeLinecap="round"
               strokeDasharray={`${2 * Math.PI * 116}`}
-              strokeDashoffset={`${2 * Math.PI * 116 * (1 - sprintProgress / 100)}`}
+              strokeDashoffset={`${2 * Math.PI * 116 * (1 - projectProgress / 100)}`}
               transform="rotate(-90 120 120)"
               className="transition-all duration-1000"
               style={{
@@ -373,7 +390,8 @@ const WheelPage = () => {
               {phases.map((phase, index) => {
                 const isCurrentPhase = index === currentPhaseIndex;
                 const isHovered = hoveredPhase === index;
-                const isLocked = !phase.isActive;
+                // Unlock all phases up to and including the current phase
+                const isLocked = index > currentPhaseIndex;
 
                 return (
                   <g key={index}>
@@ -384,8 +402,11 @@ const WheelPage = () => {
                       className={`transition-all duration-300 ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}
                       onMouseEnter={() => !isLocked && setHoveredPhase(index)}
                       onClick={() => {
-                        if (!isLocked && phase.id === "plan") {
-                          navigate("/planning");
+                        if (isLocked) return;
+                        if (phase.id === "plan") {
+                          navigate(`/planning?project=${currentProject?.id}`);
+                        } else if (phase.id === "design") {
+                          navigate(`/design?project=${currentProject?.id}`);
                         }
                       }}
                       filter={
@@ -450,7 +471,7 @@ const WheelPage = () => {
                 strokeWidth="2"
                 className="drop-shadow-sm"
               />
-              {activeSprint && (
+              {currentProject && (
                 <>
                   <text
                     x="100"
@@ -462,7 +483,7 @@ const WheelPage = () => {
                     dominantBaseline="middle"
                     className="select-none"
                   >
-                    {activeSprint.name}
+                    {currentProject.phase}
                   </text>
                   <text
                     x="100"
@@ -474,7 +495,7 @@ const WheelPage = () => {
                     dominantBaseline="middle"
                     className="select-none"
                   >
-                    {Math.round(sprintProgress)}%
+                    {Math.round(projectProgress)}%
                   </text>
                 </>
               )}

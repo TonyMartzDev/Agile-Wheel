@@ -1,35 +1,45 @@
-import { 
-  Target, 
-  TrendingUp, 
-  AlertCircle, 
+import { useState } from "react";
+import {
+  Target,
+  TrendingUp,
+  AlertCircle,
   Users,
   ChevronRight,
   BarChart3,
-  Calendar
-} from 'lucide-react';
-import { useProjects } from '../../context/ProjectContext';
+  Calendar,
+  Plus,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import { useProjects } from "../../context/ProjectContext";
+import CreateProjectModal from "../CreateProjectModal";
 
 const phaseColors = {
-  Plan: '#7c3aed',
-  Design: '#dc2626',
-  Develop: '#ea580c',
-  Test: '#0d9488',
-  Release: '#0369a1',
-  Feedback: '#15803d',
+  Plan: "#7c3aed",
+  Design: "#dc2626",
+  Develop: "#ea580c",
+  Test: "#0d9488",
+  Release: "#0369a1",
+  Feedback: "#15803d",
 };
 
 const ProductOwnerDashboard = () => {
   const { projects } = useProjects();
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Calculate stats
   const totalProjects = projects.length;
-  const avgProgress = projects.length > 0 
-    ? Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / projects.length)
-    : 0;
+  const avgProgress =
+    projects.length > 0
+      ? Math.round(
+          projects.reduce((acc, p) => acc + p.progress, 0) / projects.length,
+        )
+      : 0;
 
   // Projects at risk (behind schedule)
-  const projectsAtRisk = projects.filter(p => {
-    const daysSinceCreation = Math.floor((new Date() - new Date(p.createdAt)) / (1000 * 60 * 60 * 24));
+  const projectsAtRisk = projects.filter((p) => {
+    const daysSinceCreation = Math.floor(
+      (new Date() - new Date(p.createdAt)) / (1000 * 60 * 60 * 24),
+    );
     const expectedProgress = Math.min(daysSinceCreation * 2, 100);
     return p.progress < expectedProgress - 20;
   });
@@ -42,13 +52,34 @@ const ProductOwnerDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Create Project Button */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">My Projects</h2>
+          <p className="text-sm text-slate-500 mt-1">
+            Manage and track your product portfolio
+          </p>
+        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:shadow-lg transition-all"
+        >
+          <Plus className="w-5 h-5" />
+          Create Project
+        </button>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-500 font-medium">Total Projects</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{totalProjects}</p>
+              <p className="text-sm text-slate-500 font-medium">
+                Total Projects
+              </p>
+              <p className="text-2xl font-bold text-slate-900 mt-1">
+                {totalProjects}
+              </p>
             </div>
             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
               <Target className="w-5 h-5 text-purple-600" />
@@ -60,7 +91,9 @@ const ProductOwnerDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-500 font-medium">Avg Progress</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{avgProgress}%</p>
+              <p className="text-2xl font-bold text-slate-900 mt-1">
+                {avgProgress}%
+              </p>
             </div>
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-blue-600" />
@@ -72,7 +105,9 @@ const ProductOwnerDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-500 font-medium">At Risk</p>
-              <p className="text-2xl font-bold text-red-600 mt-1">{projectsAtRisk.length}</p>
+              <p className="text-2xl font-bold text-red-600 mt-1">
+                {projectsAtRisk.length}
+              </p>
             </div>
             <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
               <AlertCircle className="w-5 h-5 text-red-600" />
@@ -85,7 +120,10 @@ const ProductOwnerDashboard = () => {
             <div>
               <p className="text-sm text-slate-500 font-medium">Team Members</p>
               <p className="text-2xl font-bold text-slate-900 mt-1">
-                {new Set(projects.flatMap(p => p.team.map(t => t.email))).size}
+                {
+                  new Set(projects.flatMap((p) => p.team.map((t) => t.email)))
+                    .size
+                }
               </p>
             </div>
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -103,18 +141,28 @@ const ProductOwnerDashboard = () => {
               <BarChart3 className="w-5 h-5 text-purple-600" />
               Project Progress Overview
             </h2>
-            <p className="text-sm text-slate-500 mt-1">Track progress across all your projects</p>
+            <p className="text-sm text-slate-500 mt-1">
+              Track progress across all your projects
+            </p>
           </div>
 
           <div className="divide-y divide-slate-100">
             {projects.map((project) => (
-              <div key={project.id} className="p-5 hover:bg-slate-50 transition-colors cursor-pointer">
+              <Link
+                key={project.id}
+                to={`/wheel?project=${project.id}`}
+                className="block p-5 hover:bg-slate-50 transition-colors cursor-pointer"
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold text-slate-900">{project.name}</h3>
-                    <p className="text-sm text-slate-500 mt-0.5">{project.description}</p>
+                    <h3 className="font-semibold text-slate-900">
+                      {project.name}
+                    </h3>
+                    <p className="text-sm text-slate-500 mt-0.5">
+                      {project.description}
+                    </p>
                   </div>
-                  <span 
+                  <span
                     className="px-3 py-1 rounded-full text-xs font-semibold text-white"
                     style={{ backgroundColor: phaseColors[project.phase] }}
                   >
@@ -126,14 +174,16 @@ const ProductOwnerDashboard = () => {
                 <div className="mb-3">
                   <div className="flex items-center justify-between text-sm mb-1">
                     <span className="text-slate-600">Progress</span>
-                    <span className="font-semibold text-slate-900">{project.progress}%</span>
+                    <span className="font-semibold text-slate-900">
+                      {project.progress}%
+                    </span>
                   </div>
                   <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full rounded-full transition-all duration-500"
-                      style={{ 
+                      style={{
                         width: `${project.progress}%`,
-                        backgroundColor: phaseColors[project.phase]
+                        backgroundColor: phaseColors[project.phase],
                       }}
                     />
                   </div>
@@ -147,19 +197,24 @@ const ProductOwnerDashboard = () => {
                     </span>
                     <span className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      {project.tasks.filter(t => t.status === 'done').length}/{project.tasks.length} tasks
+                      {project.tasks.filter((t) => t.status === "done").length}/
+                      {project.tasks.length} tasks
                     </span>
                   </div>
                   <ChevronRight className="w-5 h-5 text-slate-400" />
                 </div>
-              </div>
+              </Link>
             ))}
 
             {projects.length === 0 && (
               <div className="p-12 text-center">
                 <Target className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="font-semibold text-slate-900 mb-1">No projects yet</h3>
-                <p className="text-slate-500 text-sm">Create your first project to get started</p>
+                <h3 className="font-semibold text-slate-900 mb-1">
+                  No projects yet
+                </h3>
+                <p className="text-slate-500 text-sm">
+                  Create your first project to get started
+                </p>
               </div>
             )}
           </div>
@@ -173,7 +228,9 @@ const ProductOwnerDashboard = () => {
               <div className="p-5 border-b border-red-100 bg-red-50 rounded-t-xl">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-red-600" />
-                  <h2 className="text-lg font-bold text-red-900">Projects at Risk</h2>
+                  <h2 className="text-lg font-bold text-red-900">
+                    Projects at Risk
+                  </h2>
                 </div>
               </div>
               <div className="divide-y divide-red-100">
@@ -191,21 +248,29 @@ const ProductOwnerDashboard = () => {
 
           {/* Phase Distribution */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">Phase Distribution</h2>
+            <h2 className="text-lg font-bold text-slate-900 mb-4">
+              Phase Distribution
+            </h2>
             <div className="space-y-3">
               {Object.entries(phaseColors).map(([phase, color]) => {
                 const count = projectsByPhase[phase] || 0;
-                const percentage = totalProjects > 0 ? (count / totalProjects) * 100 : 0;
+                const percentage =
+                  totalProjects > 0 ? (count / totalProjects) * 100 : 0;
                 return (
                   <div key={phase}>
                     <div className="flex items-center justify-between text-sm mb-1">
                       <span className="text-slate-600">{phase}</span>
-                      <span className="font-semibold text-slate-900">{count}</span>
+                      <span className="font-semibold text-slate-900">
+                        {count}
+                      </span>
                     </div>
                     <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                      <div 
+                      <div
                         className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${percentage}%`, backgroundColor: color }}
+                        style={{
+                          width: `${percentage}%`,
+                          backgroundColor: color,
+                        }}
                       />
                     </div>
                   </div>
@@ -215,6 +280,11 @@ const ProductOwnerDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Create Project Modal */}
+      {showCreateModal && (
+        <CreateProjectModal onClose={() => setShowCreateModal(false)} />
+      )}
     </div>
   );
 };

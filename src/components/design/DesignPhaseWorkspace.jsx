@@ -335,8 +335,8 @@ const DesignPhaseWorkspace = () => {
             ref={canvasRef}
             className="bg-white rounded-lg shadow-lg mx-auto relative"
             style={{
-              width: `${800 * zoom}px`,
-              height: `${600 * zoom}px`,
+              width: `${1600 * zoom}px`,
+              height: `${1200 * zoom}px`,
               cursor: tools.find((t) => t.id === selectedTool)?.cursor,
               backgroundImage: showGrid
                 ? `linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px)`
@@ -351,9 +351,9 @@ const DesignPhaseWorkspace = () => {
             onMouseLeave={handleMouseUp}
           >
             <svg
-              width={800 * zoom}
-              height={600 * zoom}
-              viewBox={`0 0 ${800} ${600}`}
+              width={1600 * zoom}
+              height={1200 * zoom}
+              viewBox={`0 0 ${1600} ${1200}`}
               className="absolute inset-0"
             >
               {elements.map((element) => renderElement(element))}

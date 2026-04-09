@@ -55,42 +55,34 @@ const DesignPhaseWorkspace = () => {
   ];
 
   const handleCanvasMouseDown = (e) => {
-    // Only handle if we clicked directly on the canvas (the ref element)
-    const isCanvasClick = e.target === canvasRef.current;
-    console.log(
-      "Canvas mousedown, isCanvasClick:",
-      isCanvasClick,
-      "target:",
-      e.target.className,
-      "tool:",
-      selectedTool,
-    );
+    const targetTag = e.target.tagName.toLowerCase();
+    console.log("Canvas mousedown, target:", targetTag, "tool:", selectedTool);
 
-    // Check if we clicked on an SVG element (shape or handle)
-    const clickedOnSVG =
-      e.target.tagName === "rect" ||
-      e.target.tagName === "circle" ||
-      e.target.tagName === "ellipse" ||
-      e.target.tagName === "polygon" ||
-      e.target.tagName === "line" ||
-      e.target.tagName === "text" ||
-      e.target.tagName === "g" ||
-      e.target.tagName === "svg";
+    // Check if we clicked on a shape or handle (NOT the svg container itself)
+    const clickedOnShape =
+      targetTag === "rect" ||
+      targetTag === "circle" ||
+      targetTag === "ellipse" ||
+      targetTag === "polygon" ||
+      targetTag === "line" ||
+      targetTag === "text" ||
+      targetTag === "g";
 
-    if (clickedOnSVG) {
+    if (clickedOnShape) {
       console.log(
-        "Clicked on SVG element, letting shape/handle handlers deal with it",
+        "Clicked on shape/handle, letting their handlers deal with it",
       );
       return;
     }
 
-    // If not clicking directly on canvas background, ignore
-    if (!isCanvasClick) {
-      console.log("Clicked on child element (not canvas), ignoring");
+    // Allow clicks on canvas DIV or SVG container (empty area)
+    const isCanvasArea = e.target === canvasRef.current || targetTag === "svg";
+    if (!isCanvasArea) {
+      console.log("Clicked on non-canvas element, ignoring");
       return;
     }
 
-    console.log("Clicked on canvas background");
+    console.log("Clicked on canvas background/SVG empty area");
 
     // Deselect if clicking empty canvas with select tool
     if (selectedTool === "select") {

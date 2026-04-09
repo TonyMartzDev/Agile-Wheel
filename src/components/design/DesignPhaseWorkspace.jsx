@@ -570,7 +570,7 @@ const DesignPhaseWorkspace = () => {
       {/* Left Sidebar - Tools */}
       <div className="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-2">
         {/* Tool Buttons */}
-        <div className="flex flex-col gap-1.5 mb-2">
+        <div className="flex flex-col gap-1.5">
           {tools.map((tool) => {
             const ToolIcon = tool.icon;
             return (
@@ -588,12 +588,11 @@ const DesignPhaseWorkspace = () => {
               </button>
             );
           })}
-        </div>
 
-        <div className="flex-1" />
+          {/* Divider */}
+          <div className="w-8 border-t border-slate-300 my-1"></div>
 
-        {/* Canvas Controls */}
-        <div className="space-y-1">
+          {/* Canvas Controls */}
           <button
             onClick={() => setShowGrid(!showGrid)}
             className={`w-11 h-11 rounded-lg flex items-center justify-center transition-all ${
@@ -626,17 +625,17 @@ const DesignPhaseWorkspace = () => {
               <ZoomOut className="w-5 h-5" />
             </button>
           </div>
-        </div>
 
-        {selectedElement && (
-          <button
-            onClick={deleteSelectedElement}
-            className="w-11 h-11 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center mt-1"
-            title="Delete Selected"
-          >
-            <Trash2 className="w-5 h-5" />
-          </button>
-        )}
+          {selectedElement && (
+            <button
+              onClick={deleteSelectedElement}
+              className="w-11 h-11 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center mt-1"
+              title="Delete Selected"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Center - Canvas */}

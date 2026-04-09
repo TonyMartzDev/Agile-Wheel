@@ -553,6 +553,14 @@ export const ProjectProvider = ({ children }) => {
     saveProjects(updatedProjects);
   };
 
+  const savePRD = (projectId, prdData) => {
+    const updatedProjects = projects.map((p) =>
+      p.id === projectId ? { ...p, prd: { ...p.prd, ...prdData } } : p,
+    );
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
   const addPhaseVote = (projectId, vote) => {
     const updatedProjects = projects.map((p) => {
       if (p.id === projectId) {
@@ -586,6 +594,7 @@ export const ProjectProvider = ({ children }) => {
     updateBugStatus,
     toggleAcceptanceCriteria,
     addPhaseVote,
+    savePRD,
   };
 
   return (

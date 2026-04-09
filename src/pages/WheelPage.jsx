@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, X, CheckCircle2, Settings } from "lucide-react";
+import {
+  ArrowLeft,
+  X,
+  CheckCircle2,
+  Settings,
+  BookOpen,
+  Eye,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../context/ProjectContext";
+import ProjectRequirementsModal from "../components/inception/ProjectRequirementsModal";
 
 const phases = [
   {
@@ -78,12 +86,15 @@ const priorityColors = {
 
 const WheelPage = () => {
   const { user } = useAuth();
-  const { projects } = useProjects();
+  const { projects, savePRD } = useProjects();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [hoveredPhase, setHoveredPhase] = useState(null);
   const [selectedTeamMember, setSelectedTeamMember] = useState(null);
   const [pulseAnimation] = useState(true);
+  const [showPRD, setShowPRD] = useState(false);
+
+  const isPO = user?.role === "product_owner";
 
   // Get project from URL params or default to first project
   const projectId = searchParams.get("project");
@@ -282,6 +293,24 @@ const WheelPage = () => {
 
         {/* User Info */}
         <div className="absolute top-6 right-6 flex items-center gap-3">
+          {/* Project Requirements Button */}
+          {isPO ? (
+            <button
+              onClick={() => setShowPRD(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+            >
+              <BookOpen className="w-4 h-4" />
+              Project Requirements
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowPRD(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 transition-all text-sm"
+            >
+              <Eye className="w-4 h-4" />
+              View Requirements
+            </button>
+          )}
           <Link
             to="/settings"
             className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
@@ -300,17 +329,22 @@ const WheelPage = () => {
           </div>
         </div>
 
-        {/* Project Name - positioned above wheel */}
+        {/* Project Name + Mission - positioned above wheel */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center z-10 max-w-2xl px-4">
           <h1 className="text-3xl font-bold text-slate-900">
             {currentProject?.name || "Project"}
           </h1>
-          <p className="text-sm text-slate-600 mt-2 italic">
-            "
-            {currentProject?.vision ||
-              "Define your project vision to keep the team focused"}
-            "
-          </p>
+          {currentProject?.prd?.mission ? (
+            <p className="text-sm text-purple-700 mt-2 italic font-medium">
+              &ldquo;{currentProject.prd.mission}&rdquo;
+            </p>
+          ) : (
+            <p className="text-sm text-slate-400 mt-2 italic">
+              {isPO
+                ? 'Click "Project Requirements" to define the mission'
+                : "No mission defined yet"}
+            </p>
+          )}
         </div>
 
         {/* The Wheel */}
@@ -588,6 +622,19 @@ const WheelPage = () => {
           members={selectedTeamMember.members}
           tasks={currentProject?.tasks || []}
           onClose={() => setSelectedTeamMember(null)}
+        />
+      )}
+
+      {/* Project Requirements Modal */}
+      {showPRD && (
+        <ProjectRequirementsModal
+          project={currentProject}
+          currentUser={user}
+          readOnly={!isPO}
+          onClose={() => setShowPRD(false)}
+          onSave={(prdData) => {
+            savePRD(currentProject.id, prdData);
+          }}
         />
       )}
 

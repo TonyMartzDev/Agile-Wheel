@@ -17,6 +17,7 @@ import {
   ZoomOut,
   Grid3x3,
   Diamond,
+  X,
 } from "lucide-react";
 
 const DesignPhaseWorkspace = () => {
@@ -269,6 +270,18 @@ const DesignPhaseWorkspace = () => {
   const loadDocument = (doc) => {
     setCurrentDocument(doc);
     setElements(doc.elements || []);
+  };
+
+  const deleteDocument = (e, docId) => {
+    e.stopPropagation();
+    const updatedDocs = documents.filter((doc) => doc.id !== docId);
+    setDocuments(updatedDocs);
+
+    // If we deleted the current document, clear the canvas
+    if (currentDocument?.id === docId) {
+      setCurrentDocument(null);
+      setElements([]);
+    }
   };
 
   const handleResizeStart = (e, element, handle) => {
@@ -743,38 +756,49 @@ const DesignPhaseWorkspace = () => {
               const isActive = currentDocument?.id === doc.id;
 
               return (
-                <button
+                <div
                   key={doc.id}
-                  onClick={() => loadDocument(doc)}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
+                  className={`relative rounded-lg transition-all ${
                     isActive
                       ? "bg-purple-100 border-2 border-purple-500"
                       : "bg-slate-50 hover:bg-slate-100 border-2 border-transparent"
                   }`}
                 >
-                  <div className="flex items-start gap-3">
-                    <DocIcon
-                      className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                        isActive ? "text-purple-600" : "text-slate-400"
-                      }`}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`font-semibold text-sm truncate ${
-                          isActive ? "text-purple-900" : "text-slate-900"
+                  <button
+                    onClick={() => loadDocument(doc)}
+                    className="w-full text-left px-4 py-3"
+                  >
+                    <div className="flex items-start gap-3">
+                      <DocIcon
+                        className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                          isActive ? "text-purple-600" : "text-slate-400"
                         }`}
-                      >
-                        {doc.name}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {docType?.name}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        {doc.elements?.length || 0} elements
-                      </p>
+                      />
+                      <div className="flex-1 min-w-0 pr-6">
+                        <p
+                          className={`font-semibold text-sm truncate ${
+                            isActive ? "text-purple-900" : "text-slate-900"
+                          }`}
+                        >
+                          {doc.name}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {docType?.name}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          {doc.elements?.length || 0} elements
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </button>
+                  </button>
+                  <button
+                    onClick={(e) => deleteDocument(e, doc.id)}
+                    className="absolute top-2 right-2 p-1 rounded hover:bg-red-100 text-slate-400 hover:text-red-600 transition-colors"
+                    title="Delete document"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               );
             })}
           </div>

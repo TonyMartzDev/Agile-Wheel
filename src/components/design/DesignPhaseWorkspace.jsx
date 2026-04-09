@@ -568,8 +568,8 @@ const DesignPhaseWorkspace = () => {
   return (
     <div className="flex h-screen bg-slate-50">
       {/* Left Sidebar - Tools */}
-      <div className="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-6 gap-4">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+      <div className="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-4 gap-2">
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
           Tools
         </h3>
         {tools.map((tool) => {
@@ -593,7 +593,7 @@ const DesignPhaseWorkspace = () => {
         <div className="flex-1" />
 
         {/* Canvas Controls */}
-        <div className="space-y-2">
+        <div className="space-y-1">
           <button
             onClick={() => setShowGrid(!showGrid)}
             className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
@@ -610,12 +610,12 @@ const DesignPhaseWorkspace = () => {
           <div className="text-center">
             <button
               onClick={() => setZoom(Math.min(zoom + 0.1, 2))}
-              className="w-12 h-12 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center mb-1"
+              className="w-12 h-12 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center"
               title="Zoom In"
             >
               <ZoomIn className="w-6 h-6" />
             </button>
-            <div className="text-xs font-semibold text-slate-600 mb-1">
+            <div className="text-xs font-semibold text-slate-600 py-1">
               {Math.round(zoom * 100)}%
             </div>
             <button

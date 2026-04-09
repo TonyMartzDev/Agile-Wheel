@@ -10,10 +10,11 @@ import SMPlanningWorkspace from "../components/planning/SMPlanningWorkspace";
 import DeveloperPlanningWorkspace from "../components/planning/DeveloperPlanningWorkspace";
 import QAPlanningWorkspace from "../components/planning/QAPlanningWorkspace";
 import PRDContextBanner from "../components/inception/PRDContextBanner";
+import CreateStoryModal from "../components/planning/CreateStoryModal";
 
 const PlanningPhasePage = () => {
   const { user } = useAuth();
-  const { projects } = useProjects();
+  const { projects, addTask } = useProjects();
 
   const currentProject = projects[0];
   const activeSprint = currentProject?.sprints?.find(
@@ -38,6 +39,7 @@ const PlanningPhasePage = () => {
     teamSize >= 1 && totalStories >= 2 && estimatedStories >= 2;
 
   const [readyVotes, setReadyVotes] = useState([]);
+  const [showCreateStory, setShowCreateStory] = useState(false);
   const developerCount =
     currentProject?.team?.filter((m) => m.role === "developer").length || 0;
   const readyPercentage =
@@ -70,9 +72,15 @@ const PlanningPhasePage = () => {
     ],
   };
 
-  // Placeholder handlers - will be implemented in ProjectContext
   const handleCreateStory = () => {
-    console.log("Create story - to be implemented");
+    setShowCreateStory(true);
+  };
+
+  const handleSaveStory = (storyData) => {
+    if (currentProject) {
+      addTask(currentProject.id, storyData);
+    }
+    setShowCreateStory(false);
   };
 
   const handleApproveStory = (storyId) => {
@@ -253,6 +261,14 @@ const PlanningPhasePage = () => {
         <PRDContextBanner project={currentProject} />
         {renderWorkspace()}
       </div>
+
+      {showCreateStory && (
+        <CreateStoryModal
+          onClose={() => setShowCreateStory(false)}
+          onSave={handleSaveStory}
+          epics={currentProject?.prd?.epics || []}
+        />
+      )}
     </div>
   );
 };

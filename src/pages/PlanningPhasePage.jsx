@@ -9,6 +9,7 @@ import POPlanningWorkspace from "../components/planning/POPlanningWorkspace";
 import SMPlanningWorkspace from "../components/planning/SMPlanningWorkspace";
 import DeveloperPlanningWorkspace from "../components/planning/DeveloperPlanningWorkspace";
 import QAPlanningWorkspace from "../components/planning/QAPlanningWorkspace";
+import PRDContextBanner from "../components/inception/PRDContextBanner";
 
 const PlanningPhasePage = () => {
   const { user } = useAuth();
@@ -249,6 +250,7 @@ const PlanningPhasePage = () => {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PRDContextBanner project={currentProject} />
         {renderWorkspace()}
       </div>
     </div>

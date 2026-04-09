@@ -88,8 +88,7 @@ const ProjectRequirementsModal = ({
   const updateEpic = (id, field, value) =>
     setEpics(epics.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
 
-  const removeEpic = (id) =>
-    setEpics(epics.filter((e) => e.id !== id));
+  const removeEpic = (id) => setEpics(epics.filter((e) => e.id !== id));
 
   const toggleEpic = (id) =>
     setExpandedEpics((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -108,8 +107,8 @@ const ProjectRequirementsModal = ({
     };
     setEpics(
       epics.map((e) =>
-        e.id === epicId ? { ...e, stories: [...e.stories, story] } : e
-      )
+        e.id === epicId ? { ...e, stories: [...e.stories, story] } : e,
+      ),
     );
     setNewStoryInputs((prev) => ({ ...prev, [epicId]: "" }));
   };
@@ -121,11 +120,11 @@ const ProjectRequirementsModal = ({
           ? {
               ...e,
               stories: e.stories.map((s) =>
-                s.id === storyId ? { ...s, [field]: value } : s
+                s.id === storyId ? { ...s, [field]: value } : s,
               ),
             }
-          : e
-      )
+          : e,
+      ),
     );
 
   const removeStory = (epicId, storyId) =>
@@ -133,8 +132,8 @@ const ProjectRequirementsModal = ({
       epics.map((e) =>
         e.id === epicId
           ? { ...e, stories: e.stories.filter((s) => s.id !== storyId) }
-          : e
-      )
+          : e,
+      ),
     );
 
   // ── Comments ──
@@ -436,6 +435,18 @@ const ProjectRequirementsModal = ({
                       <span className="text-xs text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full">
                         {epic.stories.length} stories
                       </span>
+                      {epic.stories.reduce(
+                        (sum, s) => sum + (parseInt(s.storyPoints) || 0),
+                        0,
+                      ) > 0 && (
+                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-semibold">
+                          {epic.stories.reduce(
+                            (sum, s) => sum + (parseInt(s.storyPoints) || 0),
+                            0,
+                          )}{" "}
+                          pts total
+                        </span>
+                      )}
                       {!readOnly && (
                         <button
                           onClick={(e) => {
@@ -493,7 +504,7 @@ const ProjectRequirementsModal = ({
                                           epic.id,
                                           story.id,
                                           "title",
-                                          e.target.value
+                                          e.target.value,
                                         )
                                       }
                                       className="w-full text-sm font-medium text-slate-900 border-none outline-none focus:ring-1 focus:ring-purple-400 rounded px-1"
@@ -507,7 +518,7 @@ const ProjectRequirementsModal = ({
                                           epic.id,
                                           story.id,
                                           "priority",
-                                          e.target.value
+                                          e.target.value,
                                         )
                                       }
                                       disabled={readOnly}
@@ -526,7 +537,7 @@ const ProjectRequirementsModal = ({
                                           epic.id,
                                           story.id,
                                           "status",
-                                          e.target.value
+                                          e.target.value,
                                         )
                                       }
                                       disabled={readOnly}
@@ -539,24 +550,27 @@ const ProjectRequirementsModal = ({
                                       ))}
                                     </select>
                                     {!readOnly && (
-                                      <input
-                                        type="number"
-                                        value={story.storyPoints}
-                                        onChange={(e) =>
-                                          updateStory(
-                                            epic.id,
-                                            story.id,
-                                            "storyPoints",
-                                            e.target.value
-                                          )
-                                        }
-                                        placeholder="pts"
-                                        className="w-12 text-xs px-1.5 py-0.5 border border-slate-200 rounded text-center"
-                                        min="0"
-                                      />
+                                      <label className="flex items-center gap-1 text-xs text-slate-500">
+                                        <span>pts:</span>
+                                        <input
+                                          type="number"
+                                          value={story.storyPoints}
+                                          onChange={(e) =>
+                                            updateStory(
+                                              epic.id,
+                                              story.id,
+                                              "storyPoints",
+                                              e.target.value,
+                                            )
+                                          }
+                                          placeholder="0"
+                                          className="w-14 text-xs px-1.5 py-0.5 border border-purple-200 rounded text-center font-semibold text-purple-700 focus:ring-1 focus:ring-purple-400 focus:border-transparent"
+                                          min="0"
+                                        />
+                                      </label>
                                     )}
                                     {story.storyPoints && readOnly && (
-                                      <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                                      <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-semibold">
                                         {story.storyPoints} pts
                                       </span>
                                     )}
@@ -677,7 +691,7 @@ const ProjectRequirementsModal = ({
                               day: "numeric",
                               hour: "2-digit",
                               minute: "2-digit",
-                            }
+                            },
                           )}
                         </span>
                       </div>

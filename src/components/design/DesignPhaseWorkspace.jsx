@@ -16,6 +16,7 @@ import {
   ZoomIn,
   ZoomOut,
   Grid3x3,
+  Diamond,
 } from "lucide-react";
 
 const DesignPhaseWorkspace = () => {
@@ -45,7 +46,7 @@ const DesignPhaseWorkspace = () => {
     { id: "rectangle", name: "Rectangle", icon: Square, cursor: "crosshair" },
     { id: "circle", name: "Circle", icon: Circle, cursor: "crosshair" },
     { id: "triangle", name: "Triangle", icon: Triangle, cursor: "crosshair" },
-    { id: "diamond", name: "Diamond", icon: Square, cursor: "crosshair" },
+    { id: "diamond", name: "Diamond", icon: Diamond, cursor: "crosshair" },
     { id: "arrow", name: "Arrow", icon: ArrowRight, cursor: "crosshair" },
     { id: "text", name: "Text", icon: Type, cursor: "text" },
   ];
@@ -539,6 +540,9 @@ const DesignPhaseWorkspace = () => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Don't delete element if we're editing text
+      if (editingText) return;
+
       if ((e.key === "Delete" || e.key === "Backspace") && selectedElement) {
         setElements(elements.filter((el) => el.id !== selectedElement.id));
         setSelectedElement(null);
@@ -546,7 +550,7 @@ const DesignPhaseWorkspace = () => {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedElement, elements]);
+  }, [selectedElement, elements, editingText]);
 
   return (
     <div className="flex h-screen bg-slate-50">

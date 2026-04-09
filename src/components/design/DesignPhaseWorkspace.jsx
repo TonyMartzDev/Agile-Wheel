@@ -31,6 +31,7 @@ const DesignPhaseWorkspace = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [initialBounds, setInitialBounds] = useState(null);
   const [drawingElement, setDrawingElement] = useState(null);
+  const [editingText, setEditingText] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [showGrid, setShowGrid] = useState(true);
   const [currentDocument, setCurrentDocument] = useState(null);
@@ -44,6 +45,7 @@ const DesignPhaseWorkspace = () => {
     { id: "rectangle", name: "Rectangle", icon: Square, cursor: "crosshair" },
     { id: "circle", name: "Circle", icon: Circle, cursor: "crosshair" },
     { id: "triangle", name: "Triangle", icon: Triangle, cursor: "crosshair" },
+    { id: "diamond", name: "Diamond", icon: Square, cursor: "crosshair" },
     { id: "arrow", name: "Arrow", icon: ArrowRight, cursor: "crosshair" },
     { id: "text", name: "Text", icon: Type, cursor: "text" },
   ];
@@ -56,7 +58,6 @@ const DesignPhaseWorkspace = () => {
 
   const handleCanvasMouseDown = (e) => {
     const targetTag = e.target.tagName.toLowerCase();
-    console.log("Canvas mousedown, target:", targetTag, "tool:", selectedTool);
 
     // Check if we clicked on a shape or handle (NOT the svg container itself)
     const clickedOnShape =
@@ -69,25 +70,19 @@ const DesignPhaseWorkspace = () => {
       targetTag === "g";
 
     if (clickedOnShape) {
-      console.log(
-        "Clicked on shape/handle, letting their handlers deal with it",
-      );
       return;
     }
 
     // Allow clicks on canvas DIV or SVG container (empty area)
     const isCanvasArea = e.target === canvasRef.current || targetTag === "svg";
     if (!isCanvasArea) {
-      console.log("Clicked on non-canvas element, ignoring");
       return;
     }
 
-    console.log("Clicked on canvas background/SVG empty area");
-
     // Deselect if clicking empty canvas with select tool
     if (selectedTool === "select") {
-      console.log("Deselecting element - clicked empty canvas");
       setSelectedElement(null);
+      setEditingText(null);
       return;
     }
 
@@ -117,7 +112,6 @@ const DesignPhaseWorkspace = () => {
   const handleElementMouseDown = (e, element) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log("Element mousedown, tool:", selectedTool);
     if (selectedTool !== "select") return;
 
     setSelectedElement(element);
@@ -127,6 +121,25 @@ const DesignPhaseWorkspace = () => {
       x: (e.clientX - rect.left) / zoom - element.x,
       y: (e.clientY - rect.top) / zoom - element.y,
     });
+  };
+
+  const handleTextDoubleClick = (e, element) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (selectedTool !== "select") return;
+    setEditingText(element.id);
+  };
+
+  const handleTextChange = (elementId, newText) => {
+    setElements(
+      elements.map((el) =>
+        el.id === elementId ? { ...el, text: newText } : el,
+      ),
+    );
+  };
+
+  const handleTextBlur = () => {
+    setEditingText(null);
   };
 
   const handleMouseMove = (e) => {
@@ -260,10 +273,7 @@ const DesignPhaseWorkspace = () => {
   const handleResizeStart = (e, element, handle) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log("Resize start:", handle, "element:", element.id);
-    console.log("Current selectedElement before resize:", selectedElement?.id);
     setSelectedElement(element);
-    console.log("Set selectedElement to:", element.id);
     setIsResizing(true);
     setResizeHandle(handle);
     const rect = canvasRef.current.getBoundingClientRect();
@@ -282,7 +292,6 @@ const DesignPhaseWorkspace = () => {
   const handleRotateStart = (e, element) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log("Rotate start");
     setSelectedElement(element);
     setIsRotating(true);
   };
@@ -434,6 +443,11 @@ const DesignPhaseWorkspace = () => {
         shapeElement = <polygon points={points} {...commonProps} />;
         break;
       }
+      case "diamond": {
+        const points = `${element.x + element.width / 2},${element.y} ${element.x + element.width},${element.y + element.height / 2} ${element.x + element.width / 2},${element.y + element.height} ${element.x},${element.y + element.height / 2}`;
+        shapeElement = <polygon points={points} {...commonProps} />;
+        break;
+      }
       case "arrow":
         shapeElement = (
           <>
@@ -452,7 +466,8 @@ const DesignPhaseWorkspace = () => {
           </>
         );
         break;
-      case "text":
+      case "text": {
+        const isEditing = editingText === element.id;
         shapeElement = (
           <>
             <rect
@@ -464,20 +479,50 @@ const DesignPhaseWorkspace = () => {
               stroke={isSelected ? "#f59e0b" : "transparent"}
               strokeWidth={isSelected ? 2 : 0}
               onMouseDown={(e) => handleElementMouseDown(e, element)}
+              onDoubleClick={(e) => handleTextDoubleClick(e, element)}
             />
-            <text
-              x={element.x + 10}
-              y={element.y + 25}
-              fontSize="16"
-              fill="#1e293b"
-              cursor={selectedTool === "select" ? "move" : "default"}
-              onMouseDown={(e) => handleElementMouseDown(e, element)}
-            >
-              {element.text}
-            </text>
+            {isEditing ? (
+              <foreignObject
+                x={element.x}
+                y={element.y}
+                width={element.width}
+                height={element.height}
+              >
+                <input
+                  type="text"
+                  value={element.text}
+                  onChange={(e) => handleTextChange(element.id, e.target.value)}
+                  onBlur={handleTextBlur}
+                  autoFocus
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontSize: "16px",
+                    padding: "10px",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </foreignObject>
+            ) : (
+              <text
+                x={element.x + 10}
+                y={element.y + 25}
+                fontSize="16"
+                fill="#1e293b"
+                cursor={selectedTool === "select" ? "move" : "default"}
+                onMouseDown={(e) => handleElementMouseDown(e, element)}
+                onDoubleClick={(e) => handleTextDoubleClick(e, element)}
+              >
+                {element.text}
+              </text>
+            )}
           </>
         );
         break;
+      }
       default:
         shapeElement = null;
     }
@@ -491,10 +536,6 @@ const DesignPhaseWorkspace = () => {
       </g>
     );
   };
-
-  useEffect(() => {
-    console.log("selectedElement changed to:", selectedElement?.id || "null");
-  }, [selectedElement]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

@@ -24,11 +24,13 @@ const DesignPhaseWorkspace = () => {
   const [elements, setElements] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
   const [resizeHandle, setResizeHandle] = useState(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [initialBounds, setInitialBounds] = useState(null);
+  const [drawingElement, setDrawingElement] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [showGrid, setShowGrid] = useState(true);
   const [currentDocument, setCurrentDocument] = useState(null);
@@ -52,9 +54,27 @@ const DesignPhaseWorkspace = () => {
     { id: "mockup", name: "Mockup", icon: ImageIcon, color: "green" },
   ];
 
-  const handleCanvasClick = (e) => {
-    if (selectedTool === "select") return;
+  const handleCanvasMouseDown = (e) => {
+    console.log(
+      "Canvas mousedown, target:",
+      e.target.tagName,
+      "tool:",
+      selectedTool,
+    );
+    // Only handle clicks on the canvas background, not on SVG elements
+    if (e.target.tagName !== "DIV") {
+      console.log("Clicked on SVG element, ignoring");
+      return; // Clicked on SVG element (shape or handle), let their handlers deal with it
+    }
 
+    // Deselect if clicking empty canvas with select tool
+    if (selectedTool === "select") {
+      console.log("Deselecting element");
+      setSelectedElement(null);
+      return;
+    }
+
+    // Start drawing a new shape
     const rect = canvasRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / zoom;
     const y = (e.clientY - rect.top) / zoom;
@@ -64,16 +84,17 @@ const DesignPhaseWorkspace = () => {
       type: selectedTool,
       x,
       y,
-      width: selectedTool === "text" ? 200 : 100,
-      height: selectedTool === "text" ? 40 : 100,
+      width: 1,
+      height: 1,
       rotation: 0,
       fill: "#e0e7ff",
       stroke: "#6366f1",
       text: selectedTool === "text" ? "Double click to edit" : "",
     };
 
-    setElements([...elements, newElement]);
-    setSelectedTool("select");
+    setDrawingElement(newElement);
+    setIsDrawing(true);
+    setDragStart({ x, y });
   };
 
   const handleElementMouseDown = (e, element) => {
@@ -96,7 +117,21 @@ const DesignPhaseWorkspace = () => {
     const mouseX = (e.clientX - rect.left) / zoom;
     const mouseY = (e.clientY - rect.top) / zoom;
 
-    if (isDragging && selectedElement) {
+    if (isDrawing && drawingElement) {
+      // Update drawing element size
+      const width = Math.abs(mouseX - dragStart.x);
+      const height = Math.abs(mouseY - dragStart.y);
+      const x = Math.min(mouseX, dragStart.x);
+      const y = Math.min(mouseY, dragStart.y);
+
+      setDrawingElement({
+        ...drawingElement,
+        x,
+        y,
+        width: Math.max(width, 10),
+        height: Math.max(height, 10),
+      });
+    } else if (isDragging && selectedElement) {
       // Move element
       const x = mouseX - dragStart.x;
       const y = mouseY - dragStart.y;
@@ -154,6 +189,16 @@ const DesignPhaseWorkspace = () => {
   };
 
   const handleMouseUp = () => {
+    if (isDrawing && drawingElement) {
+      // Finalize the drawn shape
+      if (drawingElement.width > 10 && drawingElement.height > 10) {
+        setElements([...elements, drawingElement]);
+        setSelectedElement(drawingElement);
+      }
+      setDrawingElement(null);
+      setIsDrawing(false);
+      setSelectedTool("select");
+    }
     setIsDragging(false);
     setIsResizing(false);
     setIsRotating(false);
@@ -198,8 +243,10 @@ const DesignPhaseWorkspace = () => {
   const handleResizeStart = (e, element, handle) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log("Resize start:", handle);
+    console.log("Resize start:", handle, "element:", element.id);
+    console.log("Current selectedElement before resize:", selectedElement?.id);
     setSelectedElement(element);
+    console.log("Set selectedElement to:", element.id);
     setIsResizing(true);
     setResizeHandle(handle);
     const rect = canvasRef.current.getBoundingClientRect();
@@ -328,6 +375,7 @@ const DesignPhaseWorkspace = () => {
 
   const renderElement = (element) => {
     const isSelected = selectedElement?.id === element.id;
+    // Removed excessive logging - only log when selection changes
     const centerX = element.x + element.width / 2;
     const centerY = element.y + element.height / 2;
     const rotation = element.rotation || 0;
@@ -426,6 +474,10 @@ const DesignPhaseWorkspace = () => {
       </g>
     );
   };
+
+  useEffect(() => {
+    console.log("selectedElement changed to:", selectedElement?.id || "null");
+  }, [selectedElement]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -551,7 +603,7 @@ const DesignPhaseWorkspace = () => {
                 ? `${20 * zoom}px ${20 * zoom}px`
                 : "auto",
             }}
-            onClick={handleCanvasClick}
+            onMouseDown={handleCanvasMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
@@ -564,6 +616,7 @@ const DesignPhaseWorkspace = () => {
               style={{ pointerEvents: "all" }}
             >
               {elements.map((element) => renderElement(element))}
+              {drawingElement && renderElement(drawingElement)}
             </svg>
 
             {!currentDocument && (

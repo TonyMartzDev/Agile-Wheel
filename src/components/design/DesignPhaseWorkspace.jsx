@@ -287,7 +287,7 @@ const DesignPhaseWorkspace = () => {
     setIsRotating(true);
   };
 
-  const renderResizeHandles = (element) => {
+  const renderResizeHandles = (element, rotation, centerX, centerY) => {
     const handleSize = 10;
     const handles = [
       { pos: "nw", x: element.x, y: element.y, cursor: "nw-resize" },
@@ -336,7 +336,7 @@ const DesignPhaseWorkspace = () => {
     ];
 
     return (
-      <>
+      <g transform={`rotate(${rotation} ${centerX} ${centerY})`}>
         {/* Selection bounding box */}
         <rect
           x={element.x}
@@ -386,7 +386,7 @@ const DesignPhaseWorkspace = () => {
             onMouseDown={(e) => handleRotateStart(e, element)}
           />
         </g>
-      </>
+      </g>
     );
   };
 
@@ -487,7 +487,7 @@ const DesignPhaseWorkspace = () => {
         <g transform={`rotate(${rotation} ${centerX} ${centerY})`}>
           {shapeElement}
         </g>
-        {isSelected && renderResizeHandles(element)}
+        {isSelected && renderResizeHandles(element, rotation, centerX, centerY)}
       </g>
     );
   };

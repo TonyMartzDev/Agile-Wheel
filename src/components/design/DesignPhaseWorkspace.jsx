@@ -568,24 +568,21 @@ const DesignPhaseWorkspace = () => {
   return (
     <div className="flex h-screen bg-slate-50">
       {/* Left Sidebar - Tools */}
-      <div className="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-4 gap-2">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-          Tools
-        </h3>
+      <div className="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-2 gap-1.5">
         {tools.map((tool) => {
           const ToolIcon = tool.icon;
           return (
             <button
               key={tool.id}
               onClick={() => setSelectedTool(tool.id)}
-              className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
+              className={`w-11 h-11 rounded-lg flex items-center justify-center transition-all ${
                 selectedTool === tool.id
                   ? "bg-purple-600 text-white shadow-lg"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
               title={tool.name}
             >
-              <ToolIcon className="w-6 h-6" />
+              <ToolIcon className="w-5 h-5" />
             </button>
           );
         })}
@@ -596,34 +593,34 @@ const DesignPhaseWorkspace = () => {
         <div className="space-y-1">
           <button
             onClick={() => setShowGrid(!showGrid)}
-            className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
+            className={`w-11 h-11 rounded-lg flex items-center justify-center transition-all ${
               showGrid
                 ? "bg-blue-600 text-white"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
             title="Toggle Grid"
           >
-            <Grid3x3 className="w-6 h-6" />
+            <Grid3x3 className="w-5 h-5" />
           </button>
 
           {/* Zoom Controls */}
           <div className="text-center">
             <button
               onClick={() => setZoom(Math.min(zoom + 0.1, 2))}
-              className="w-12 h-12 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center"
+              className="w-11 h-11 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center"
               title="Zoom In"
             >
-              <ZoomIn className="w-6 h-6" />
+              <ZoomIn className="w-5 h-5" />
             </button>
-            <div className="text-xs font-semibold text-slate-600 py-1">
+            <div className="text-[10px] font-semibold text-slate-600 py-0.5">
               {Math.round(zoom * 100)}%
             </div>
             <button
               onClick={() => setZoom(Math.max(zoom - 0.1, 0.5))}
-              className="w-12 h-12 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center"
+              className="w-11 h-11 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center"
               title="Zoom Out"
             >
-              <ZoomOut className="w-6 h-6" />
+              <ZoomOut className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -631,10 +628,10 @@ const DesignPhaseWorkspace = () => {
         {selectedElement && (
           <button
             onClick={deleteSelectedElement}
-            className="w-12 h-12 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center"
+            className="w-11 h-11 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center mt-1"
             title="Delete Selected"
           >
-            <Trash2 className="w-6 h-6" />
+            <Trash2 className="w-5 h-5" />
           </button>
         )}
       </div>

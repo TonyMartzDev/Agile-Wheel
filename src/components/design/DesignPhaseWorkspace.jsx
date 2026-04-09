@@ -24,7 +24,11 @@ const DesignPhaseWorkspace = () => {
   const [elements, setElements] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [isRotating, setIsRotating] = useState(false);
+  const [resizeHandle, setResizeHandle] = useState(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [initialBounds, setInitialBounds] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [showGrid, setShowGrid] = useState(true);
   const [currentDocument, setCurrentDocument] = useState(null);
@@ -62,6 +66,7 @@ const DesignPhaseWorkspace = () => {
       y,
       width: selectedTool === "text" ? 200 : 100,
       height: selectedTool === "text" ? 40 : 100,
+      rotation: 0,
       fill: "#e0e7ff",
       stroke: "#6366f1",
       text: selectedTool === "text" ? "Double click to edit" : "",
@@ -73,6 +78,8 @@ const DesignPhaseWorkspace = () => {
 
   const handleElementMouseDown = (e, element) => {
     e.stopPropagation();
+    e.preventDefault();
+    console.log("Element mousedown, tool:", selectedTool);
     if (selectedTool !== "select") return;
 
     setSelectedElement(element);
@@ -85,21 +92,72 @@ const DesignPhaseWorkspace = () => {
   };
 
   const handleMouseMove = (e) => {
-    if (!isDragging || !selectedElement) return;
-
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / zoom - dragStart.x;
-    const y = (e.clientY - rect.top) / zoom - dragStart.y;
+    const mouseX = (e.clientX - rect.left) / zoom;
+    const mouseY = (e.clientY - rect.top) / zoom;
 
-    setElements(
-      elements.map((el) =>
-        el.id === selectedElement.id ? { ...el, x, y } : el,
-      ),
-    );
+    if (isDragging && selectedElement) {
+      // Move element
+      const x = mouseX - dragStart.x;
+      const y = mouseY - dragStart.y;
+      setElements(
+        elements.map((el) =>
+          el.id === selectedElement.id ? { ...el, x, y } : el,
+        ),
+      );
+    } else if (isResizing && selectedElement && resizeHandle) {
+      // Resize element
+      const dx = mouseX - dragStart.x;
+      const dy = mouseY - dragStart.y;
+
+      let newBounds = { ...initialBounds };
+
+      if (resizeHandle.includes("e")) {
+        newBounds.width = Math.max(20, initialBounds.width + dx);
+      }
+      if (resizeHandle.includes("w")) {
+        const newWidth = Math.max(20, initialBounds.width - dx);
+        newBounds.x = initialBounds.x + (initialBounds.width - newWidth);
+        newBounds.width = newWidth;
+      }
+      if (resizeHandle.includes("s")) {
+        newBounds.height = Math.max(20, initialBounds.height + dy);
+      }
+      if (resizeHandle.includes("n")) {
+        const newHeight = Math.max(20, initialBounds.height - dy);
+        newBounds.y = initialBounds.y + (initialBounds.height - newHeight);
+        newBounds.height = newHeight;
+      }
+
+      const updatedElement = { ...selectedElement, ...newBounds };
+      setSelectedElement(updatedElement);
+      setElements(
+        elements.map((el) =>
+          el.id === selectedElement.id ? updatedElement : el,
+        ),
+      );
+    } else if (isRotating && selectedElement) {
+      // Rotate element
+      const centerX = selectedElement.x + selectedElement.width / 2;
+      const centerY = selectedElement.y + selectedElement.height / 2;
+      const angle = Math.atan2(mouseY - centerY, mouseX - centerX);
+      const rotation = (angle * 180) / Math.PI + 90;
+
+      const updatedElement = { ...selectedElement, rotation };
+      setSelectedElement(updatedElement);
+      setElements(
+        elements.map((el) =>
+          el.id === selectedElement.id ? updatedElement : el,
+        ),
+      );
+    }
   };
 
   const handleMouseUp = () => {
     setIsDragging(false);
+    setIsResizing(false);
+    setIsRotating(false);
+    setResizeHandle(null);
   };
 
   const deleteSelectedElement = () => {
@@ -137,8 +195,143 @@ const DesignPhaseWorkspace = () => {
     setElements(doc.elements || []);
   };
 
+  const handleResizeStart = (e, element, handle) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log("Resize start:", handle);
+    setSelectedElement(element);
+    setIsResizing(true);
+    setResizeHandle(handle);
+    const rect = canvasRef.current.getBoundingClientRect();
+    setDragStart({
+      x: (e.clientX - rect.left) / zoom,
+      y: (e.clientY - rect.top) / zoom,
+    });
+    setInitialBounds({
+      x: element.x,
+      y: element.y,
+      width: element.width,
+      height: element.height,
+    });
+  };
+
+  const handleRotateStart = (e, element) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log("Rotate start");
+    setSelectedElement(element);
+    setIsRotating(true);
+  };
+
+  const renderResizeHandles = (element) => {
+    const handleSize = 10;
+    const handles = [
+      { pos: "nw", x: element.x, y: element.y, cursor: "nw-resize" },
+      {
+        pos: "n",
+        x: element.x + element.width / 2,
+        y: element.y,
+        cursor: "n-resize",
+      },
+      {
+        pos: "ne",
+        x: element.x + element.width,
+        y: element.y,
+        cursor: "ne-resize",
+      },
+      {
+        pos: "e",
+        x: element.x + element.width,
+        y: element.y + element.height / 2,
+        cursor: "e-resize",
+      },
+      {
+        pos: "se",
+        x: element.x + element.width,
+        y: element.y + element.height,
+        cursor: "se-resize",
+      },
+      {
+        pos: "s",
+        x: element.x + element.width / 2,
+        y: element.y + element.height,
+        cursor: "s-resize",
+      },
+      {
+        pos: "sw",
+        x: element.x,
+        y: element.y + element.height,
+        cursor: "sw-resize",
+      },
+      {
+        pos: "w",
+        x: element.x,
+        y: element.y + element.height / 2,
+        cursor: "w-resize",
+      },
+    ];
+
+    return (
+      <>
+        {/* Selection bounding box */}
+        <rect
+          x={element.x}
+          y={element.y}
+          width={element.width}
+          height={element.height}
+          fill="none"
+          stroke="#f59e0b"
+          strokeWidth={2}
+          strokeDasharray="5,5"
+          pointerEvents="none"
+        />
+        {handles.map((handle) => (
+          <rect
+            key={handle.pos}
+            x={handle.x - handleSize / 2}
+            y={handle.y - handleSize / 2}
+            width={handleSize}
+            height={handleSize}
+            fill="white"
+            stroke="#f59e0b"
+            strokeWidth={2}
+            cursor={handle.cursor}
+            style={{ pointerEvents: "all" }}
+            onMouseDown={(e) => handleResizeStart(e, element, handle.pos)}
+          />
+        ))}
+        {/* Rotation handle */}
+        <g>
+          <line
+            x1={element.x + element.width / 2}
+            y1={element.y}
+            x2={element.x + element.width / 2}
+            y2={element.y - 30}
+            stroke="#f59e0b"
+            strokeWidth={2}
+          />
+          <circle
+            cx={element.x + element.width / 2}
+            cy={element.y - 30}
+            r={8}
+            fill="white"
+            stroke="#f59e0b"
+            strokeWidth={2}
+            cursor="grab"
+            style={{ pointerEvents: "all" }}
+            onMouseDown={(e) => handleRotateStart(e, element)}
+          />
+        </g>
+      </>
+    );
+  };
+
   const renderElement = (element) => {
     const isSelected = selectedElement?.id === element.id;
+    const centerX = element.x + element.width / 2;
+    const centerY = element.y + element.height / 2;
+    const rotation = element.rotation || 0;
+
     const commonProps = {
       fill: element.fill,
       stroke: isSelected ? "#f59e0b" : element.stroke,
@@ -147,11 +340,11 @@ const DesignPhaseWorkspace = () => {
       onMouseDown: (e) => handleElementMouseDown(e, element),
     };
 
+    let shapeElement;
     switch (element.type) {
       case "rectangle":
-        return (
+        shapeElement = (
           <rect
-            key={element.id}
             x={element.x}
             y={element.y}
             width={element.width}
@@ -159,10 +352,10 @@ const DesignPhaseWorkspace = () => {
             {...commonProps}
           />
         );
+        break;
       case "circle":
-        return (
+        shapeElement = (
           <ellipse
-            key={element.id}
             cx={element.x + element.width / 2}
             cy={element.y + element.height / 2}
             rx={element.width / 2}
@@ -170,13 +363,15 @@ const DesignPhaseWorkspace = () => {
             {...commonProps}
           />
         );
+        break;
       case "triangle": {
         const points = `${element.x + element.width / 2},${element.y} ${element.x + element.width},${element.y + element.height} ${element.x},${element.y + element.height}`;
-        return <polygon key={element.id} points={points} {...commonProps} />;
+        shapeElement = <polygon points={points} {...commonProps} />;
+        break;
       }
       case "arrow":
-        return (
-          <g key={element.id}>
+        shapeElement = (
+          <>
             <line
               x1={element.x}
               y1={element.y}
@@ -189,11 +384,12 @@ const DesignPhaseWorkspace = () => {
               points={`${element.x + element.width},${element.y + element.height} ${element.x + element.width - 10},${element.y + element.height - 5} ${element.x + element.width - 10},${element.y + element.height + 5}`}
               {...commonProps}
             />
-          </g>
+          </>
         );
+        break;
       case "text":
-        return (
-          <g key={element.id}>
+        shapeElement = (
+          <>
             <rect
               x={element.x}
               y={element.y}
@@ -214,11 +410,21 @@ const DesignPhaseWorkspace = () => {
             >
               {element.text}
             </text>
-          </g>
+          </>
         );
+        break;
       default:
-        return null;
+        shapeElement = null;
     }
+
+    return (
+      <g key={element.id}>
+        <g transform={`rotate(${rotation} ${centerX} ${centerY})`}>
+          {shapeElement}
+        </g>
+        {isSelected && renderResizeHandles(element)}
+      </g>
+    );
   };
 
   useEffect(() => {
@@ -355,6 +561,7 @@ const DesignPhaseWorkspace = () => {
               height={1200 * zoom}
               viewBox={`0 0 ${1600} ${1200}`}
               className="absolute inset-0"
+              style={{ pointerEvents: "all" }}
             >
               {elements.map((element) => renderElement(element))}
             </svg>

@@ -568,24 +568,27 @@ const DesignPhaseWorkspace = () => {
   return (
     <div className="flex h-screen bg-slate-50">
       {/* Left Sidebar - Tools */}
-      <div className="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-2 gap-1.5">
-        {tools.map((tool) => {
-          const ToolIcon = tool.icon;
-          return (
-            <button
-              key={tool.id}
-              onClick={() => setSelectedTool(tool.id)}
-              className={`w-11 h-11 rounded-lg flex items-center justify-center transition-all ${
-                selectedTool === tool.id
-                  ? "bg-purple-600 text-white shadow-lg"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-              title={tool.name}
-            >
-              <ToolIcon className="w-5 h-5" />
-            </button>
-          );
-        })}
+      <div className="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-2">
+        {/* Tool Buttons */}
+        <div className="flex flex-col gap-1.5 mb-2">
+          {tools.map((tool) => {
+            const ToolIcon = tool.icon;
+            return (
+              <button
+                key={tool.id}
+                onClick={() => setSelectedTool(tool.id)}
+                className={`w-11 h-11 rounded-lg flex items-center justify-center transition-all ${
+                  selectedTool === tool.id
+                    ? "bg-purple-600 text-white shadow-lg"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+                title={tool.name}
+              >
+                <ToolIcon className="w-5 h-5" />
+              </button>
+            );
+          })}
+        </div>
 
         <div className="flex-1" />
 

@@ -55,21 +55,46 @@ const DesignPhaseWorkspace = () => {
   ];
 
   const handleCanvasMouseDown = (e) => {
+    // Only handle if we clicked directly on the canvas (the ref element)
+    const isCanvasClick = e.target === canvasRef.current;
     console.log(
-      "Canvas mousedown, target:",
-      e.target.tagName,
+      "Canvas mousedown, isCanvasClick:",
+      isCanvasClick,
+      "target:",
+      e.target.className,
       "tool:",
       selectedTool,
     );
-    // Only handle clicks on the canvas background, not on SVG elements
-    if (e.target.tagName !== "DIV") {
-      console.log("Clicked on SVG element, ignoring");
-      return; // Clicked on SVG element (shape or handle), let their handlers deal with it
+
+    // Check if we clicked on an SVG element (shape or handle)
+    const clickedOnSVG =
+      e.target.tagName === "rect" ||
+      e.target.tagName === "circle" ||
+      e.target.tagName === "ellipse" ||
+      e.target.tagName === "polygon" ||
+      e.target.tagName === "line" ||
+      e.target.tagName === "text" ||
+      e.target.tagName === "g" ||
+      e.target.tagName === "svg";
+
+    if (clickedOnSVG) {
+      console.log(
+        "Clicked on SVG element, letting shape/handle handlers deal with it",
+      );
+      return;
     }
+
+    // If not clicking directly on canvas background, ignore
+    if (!isCanvasClick) {
+      console.log("Clicked on child element (not canvas), ignoring");
+      return;
+    }
+
+    console.log("Clicked on canvas background");
 
     // Deselect if clicking empty canvas with select tool
     if (selectedTool === "select") {
-      console.log("Deselecting element");
+      console.log("Deselecting element - clicked empty canvas");
       setSelectedElement(null);
       return;
     }
@@ -620,7 +645,10 @@ const DesignPhaseWorkspace = () => {
             </svg>
 
             {!currentDocument && (
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div
+                className="absolute inset-0 flex items-center justify-center"
+                style={{ pointerEvents: "none" }}
+              >
                 <div className="text-center">
                   <Layers className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-slate-900 mb-2">

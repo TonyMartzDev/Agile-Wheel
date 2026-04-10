@@ -475,6 +475,22 @@ export const ProjectProvider = ({ children }) => {
     saveProjects(updatedProjects);
   };
 
+  const moveTaskToSprint = (projectId, taskId, sprintId) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id === projectId) {
+        return {
+          ...p,
+          tasks: p.tasks.map((t) =>
+            t.id === taskId ? { ...t, sprint: sprintId, status: "todo" } : t,
+          ),
+        };
+      }
+      return p;
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
   const updateTaskStatus = (projectId, taskId, status) => {
     const updatedProjects = projects.map((p) => {
       if (p.id === projectId) {
@@ -595,6 +611,7 @@ export const ProjectProvider = ({ children }) => {
     toggleAcceptanceCriteria,
     addPhaseVote,
     savePRD,
+    moveTaskToSprint,
   };
 
   return (

@@ -14,7 +14,7 @@ import CreateStoryModal from "../components/planning/CreateStoryModal";
 
 const PlanningPhasePage = () => {
   const { user } = useAuth();
-  const { projects, addTask } = useProjects();
+  const { projects, addTask, moveTaskToSprint } = useProjects();
 
   const currentProject = projects[0];
   const activeSprint = currentProject?.sprints?.find(
@@ -81,6 +81,12 @@ const PlanningPhasePage = () => {
       addTask(currentProject.id, storyData);
     }
     setShowCreateStory(false);
+  };
+
+  const handleMoveToSprint = (taskId) => {
+    if (currentProject && activeSprint) {
+      moveTaskToSprint(currentProject.id, taskId, activeSprint.id);
+    }
   };
 
   const handleApproveStory = (storyId) => {
@@ -157,6 +163,8 @@ const PlanningPhasePage = () => {
             onReorderStories={handleReorderStories}
             onUpdateStoryValue={handleUpdateStoryValue}
             onLinkEpic={handleLinkEpic}
+            onMoveToSprint={handleMoveToSprint}
+            hasActiveSprint={!!activeSprint}
           />
         );
 
@@ -185,6 +193,8 @@ const PlanningPhasePage = () => {
             onMarkReady={handleMarkReady}
             isReady={readyVotes.includes(user?.id)}
             readyPercentage={readyPercentage}
+            onMoveToSprint={handleMoveToSprint}
+            hasActiveSprint={!!activeSprint}
           />
         );
 

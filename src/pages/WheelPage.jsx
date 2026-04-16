@@ -203,59 +203,99 @@ const WheelPage = () => {
   const displayIssues = displayPhase ? getPhaseIssues(displayPhase.id) : [];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div
+      className="min-h-screen flex"
+      style={{
+        background:
+          "linear-gradient(135deg, #0f0c29 0%, #302b63 40%, #24243e 100%)",
+      }}
+    >
       {/* Issues Sidebar */}
-      <div className="w-80 bg-white border-r border-slate-200 p-6 flex flex-col shadow-sm">
-        <div className="flex items-center justify-between mb-6">
+      <div
+        className="w-72 flex flex-col flex-shrink-0"
+        style={{
+          background: "rgba(255,255,255,0.04)",
+          backdropFilter: "blur(20px)",
+          borderRight: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        {/* Sidebar header */}
+        <div
+          className="px-5 pt-5 pb-4"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+        >
           <Link
             to="/dashboard"
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors"
+            className="flex items-center gap-2 text-white/50 hover:text-white/90 transition-colors group mb-5"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <div className="p-1.5 rounded-lg group-hover:bg-white/10 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+            </div>
             <span className="text-sm font-medium">Back to Dashboard</span>
           </Link>
-        </div>
-
-        {/* Phase Issues Header */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-1">
+          {/* Phase badge */}
+          <div className="flex items-center gap-2.5">
             <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: displayPhase.color }}
+              className="w-2.5 h-2.5 rounded-full shadow-lg flex-shrink-0"
+              style={{
+                backgroundColor: displayPhase.color,
+                boxShadow: `0 0 8px ${displayPhase.color}`,
+              }}
             />
-            <h2 className="text-lg font-bold text-slate-900">
-              {displayPhase.name} Issues
+            <h2 className="text-base font-bold text-white/90 truncate">
+              {displayPhase.name}
             </h2>
+            <span
+              className="ml-auto text-xs px-2 py-0.5 rounded-full font-medium"
+              style={{
+                background:
+                  hoveredPhase !== null
+                    ? "rgba(148,163,184,0.15)"
+                    : "rgba(139,92,246,0.2)",
+                color:
+                  hoveredPhase !== null ? "rgba(203,213,225,0.8)" : "#c4b5fd",
+                border: `1px solid ${hoveredPhase !== null ? "rgba(148,163,184,0.2)" : "rgba(139,92,246,0.3)"}`,
+              }}
+            >
+              {hoveredPhase !== null ? "preview" : "active"}
+            </span>
           </div>
-          <p className="text-sm text-slate-500">
-            {hoveredPhase !== null ? "Preview" : "Current phase"}
-          </p>
         </div>
 
         {/* Issues List */}
-        <div className="flex-1 overflow-y-auto space-y-3">
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {displayIssues.length > 0 ? (
             displayIssues.map((issue) => (
               <div
                 key={issue.id}
-                className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all"
+                className="rounded-xl p-3.5 transition-all cursor-default group"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "rgba(255,255,255,0.09)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "rgba(255,255,255,0.05)")
+                }
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2.5">
                   <div
-                    className={`w-2 h-2 rounded-full mt-2 ${priorityColors[issue.priority]?.dot || "bg-slate-400"}`}
+                    className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${priorityColors[issue.priority]?.dot || "bg-slate-400"}`}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-slate-900 text-sm truncate">
+                    <p className="font-medium text-white/80 text-sm truncate leading-snug">
                       {issue.title}
                     </p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2 mt-1.5">
                       <span
-                        className={`px-2 py-0.5 rounded text-xs font-medium ${priorityColors[issue.priority]?.bg} ${priorityColors[issue.priority]?.text}`}
+                        className={`px-2 py-0.5 rounded-full text-xs font-semibold ${priorityColors[issue.priority]?.bg} ${priorityColors[issue.priority]?.text}`}
                       >
                         {issue.priority}
                       </span>
                       {issue.assignee && (
-                        <span className="text-xs text-slate-500 truncate">
+                        <span className="text-xs text-white/40 truncate">
                           {issue.assignee}
                         </span>
                       )}
@@ -265,26 +305,42 @@ const WheelPage = () => {
               </div>
             ))
           ) : (
-            <div className="text-center py-8">
-              <CheckCircle2 className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="text-slate-400 text-sm">No issues in this phase</p>
+            <div className="text-center py-10">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3"
+                style={{ background: "rgba(255,255,255,0.06)" }}
+              >
+                <CheckCircle2 className="w-6 h-6 text-white/20" />
+              </div>
+              <p className="text-white/30 text-sm">No issues here</p>
             </div>
           )}
         </div>
 
         {/* Sprint Info */}
         {activeSprint && (
-          <div className="mt-4 pt-4 border-t border-slate-200">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-slate-600">{activeSprint.name}</span>
-              <span className="text-slate-900 font-medium">
-                {Math.round(sprintProgress)}% complete
+          <div
+            className="p-4"
+            style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <div className="flex items-center justify-between text-xs mb-2.5">
+              <span className="text-white/50 font-medium">
+                {activeSprint.name}
+              </span>
+              <span className="text-purple-300 font-bold">
+                {Math.round(sprintProgress)}%
               </span>
             </div>
-            <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+            <div
+              className="h-1.5 rounded-full overflow-hidden"
+              style={{ background: "rgba(255,255,255,0.1)" }}
+            >
               <div
-                className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-500"
-                style={{ width: `${sprintProgress}%` }}
+                className="h-full rounded-full transition-all duration-700"
+                style={{
+                  width: `${sprintProgress}%`,
+                  background: "linear-gradient(90deg, #8b5cf6, #3b82f6)",
+                }}
               />
             </div>
           </div>
@@ -295,10 +351,10 @@ const WheelPage = () => {
       <div className="flex-1 flex items-center justify-center relative p-8">
         {/* Project Title */}
         <div className="absolute top-6 left-6">
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-xl font-bold text-white/90">
             {currentProject?.name || "Project"}
           </h1>
-          <p className="text-slate-500 text-sm">
+          <p className="text-white/40 text-sm mt-0.5">
             {currentProject?.description}
           </p>
         </div>
@@ -309,7 +365,19 @@ const WheelPage = () => {
           {canCustomize && (
             <button
               onClick={() => setShowWheelBuilder(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 hover:border-purple-400 hover:text-purple-700 transition-all text-sm shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all"
+              style={{
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "rgba(255,255,255,0.85)",
+                backdropFilter: "blur(8px)",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "rgba(139,92,246,0.3)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "rgba(255,255,255,0.1)")
+              }
             >
               <Pencil className="w-4 h-4" />
               Customize Wheel
@@ -319,7 +387,10 @@ const WheelPage = () => {
           {isPO ? (
             <button
               onClick={() => setShowPRD(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm text-white transition-all hover:shadow-lg hover:shadow-purple-900/40"
+              style={{
+                background: "linear-gradient(135deg, #7c3aed, #2563eb)",
+              }}
             >
               <BookOpen className="w-4 h-4" />
               Project Requirements
@@ -327,7 +398,18 @@ const WheelPage = () => {
           ) : (
             <button
               onClick={() => setShowPRD(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 transition-all text-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all"
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                color: "rgba(255,255,255,0.75)",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "rgba(255,255,255,0.14)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "rgba(255,255,255,0.08)")
+              }
             >
               <Eye className="w-4 h-4" />
               View Requirements
@@ -335,35 +417,50 @@ const WheelPage = () => {
           )}
           <Link
             to="/settings"
-            className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 rounded-xl transition-colors"
+            style={{ color: "rgba(255,255,255,0.45)" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "rgba(255,255,255,0.9)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "rgba(255,255,255,0.45)";
+              e.currentTarget.style.background = "transparent";
+            }}
             title="Settings"
           >
             <Settings className="w-5 h-5" />
           </Link>
           <div className="text-right">
-            <p className="text-sm font-medium text-slate-900">{user?.name}</p>
-            <p className="text-xs text-slate-500">
+            <p className="text-sm font-semibold text-white/85">{user?.name}</p>
+            <p className="text-xs text-white/40 capitalize">
               {user?.role?.replace("_", " ")}
             </p>
           </div>
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg ring-2 ring-white/20">
             {user?.name?.charAt(0).toUpperCase() || "U"}
           </div>
         </div>
 
         {/* Project Name + Mission - positioned above wheel */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center z-10 max-w-2xl px-4">
-          <h1 className="text-3xl font-bold text-slate-900">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center z-10 max-w-2xl px-4 pointer-events-none">
+          <h1 className="text-3xl font-bold text-white/90 tracking-tight drop-shadow-lg">
             {currentProject?.name || "Project"}
           </h1>
           {currentProject?.prd?.mission ? (
-            <p className="text-sm text-purple-700 mt-2 italic font-medium">
+            <p
+              className="text-sm mt-2 italic font-medium"
+              style={{ color: "rgba(196,181,253,0.85)" }}
+            >
               &ldquo;{currentProject.prd.mission}&rdquo;
             </p>
           ) : (
-            <p className="text-sm text-slate-400 mt-2 italic">
+            <p
+              className="text-sm mt-2 italic"
+              style={{ color: "rgba(255,255,255,0.25)" }}
+            >
               {isPO
-                ? 'Click "Project Requirements" to define the mission'
+                ? 'Open "Project Requirements" to define the mission'
                 : "No mission defined yet"}
             </p>
           )}
@@ -652,13 +749,20 @@ const WheelPage = () => {
                   {teamMembers.slice(0, 3).map((member) => (
                     <div key={member.id} className="relative">
                       <div
-                        className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white text-xs font-semibold border-2 border-white shadow-lg"
+                        className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shadow-lg"
+                        style={{
+                          border: "2px solid rgba(255,255,255,0.2)",
+                          boxShadow: "0 0 12px rgba(139,92,246,0.5)",
+                        }}
                         title={`${member.name} — active in ${phase.name}`}
                       >
                         {member.name.charAt(0)}
                       </div>
                       {/* Live indicator dot */}
-                      <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border border-white animate-pulse" />
+                      <span
+                        className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"
+                        style={{ border: "2px solid rgba(15,12,41,0.8)" }}
+                      />
                     </div>
                   ))}
                   {teamMembers.length > 3 && (
@@ -675,29 +779,60 @@ const WheelPage = () => {
         {/* Phase Description Tooltip */}
         {hoveredPhase !== null && phases[hoveredPhase] && (
           <div
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 border-2 shadow-2xl max-w-sm pointer-events-none"
-            style={{ borderColor: phases[hoveredPhase].color }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-2xl p-4 max-w-sm pointer-events-none"
+            style={{
+              background: "rgba(15,12,41,0.85)",
+              backdropFilter: "blur(20px)",
+              border: `1px solid ${phases[hoveredPhase].color}55`,
+              boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px ${phases[hoveredPhase].color}33`,
+            }}
           >
-            <div className="flex items-center gap-2 mb-1.5">
+            <div className="flex items-center gap-2 mb-2">
               <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: phases[hoveredPhase].color }}
+                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                style={{
+                  backgroundColor: phases[hoveredPhase].color,
+                  boxShadow: `0 0 8px ${phases[hoveredPhase].color}`,
+                }}
               />
-              <h3 className="font-bold text-slate-900">
+              <h3 className="font-bold text-white/90 text-sm">
                 {phases[hoveredPhase].name}
               </h3>
               {hoveredPhase > currentPhaseIndex && (
-                <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+                <span
+                  className="text-xs px-2 py-0.5 rounded-full"
+                  style={{
+                    background: "rgba(255,255,255,0.08)",
+                    color: "rgba(255,255,255,0.4)",
+                  }}
+                >
                   Upcoming
                 </span>
               )}
               {hoveredPhase === currentPhaseIndex && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">
+                <span
+                  className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                  style={{
+                    background: "rgba(74,222,128,0.15)",
+                    color: "#4ade80",
+                  }}
+                >
                   Active
                 </span>
               )}
+              {hoveredPhase < currentPhaseIndex && (
+                <span
+                  className="text-xs px-2 py-0.5 rounded-full"
+                  style={{
+                    background: "rgba(139,92,246,0.15)",
+                    color: "#c4b5fd",
+                  }}
+                >
+                  Completed
+                </span>
+              )}
             </div>
-            <p className="text-slate-600 text-sm">
+            <p className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
               {phases[hoveredPhase].description}
             </p>
           </div>
@@ -731,6 +866,7 @@ const WheelPage = () => {
       {showWheelBuilder && currentProject && (
         <WheelBuilderModal
           project={currentProject}
+          currentPhaseIndex={currentPhaseIndex}
           onClose={() => setShowWheelBuilder(false)}
           onSave={(newPhases) => {
             updateWheelPhases(currentProject.id, newPhases);

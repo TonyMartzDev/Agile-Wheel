@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../context/ProjectContext";
@@ -11,12 +11,28 @@ import DeveloperPlanningWorkspace from "../components/planning/DeveloperPlanning
 import QAPlanningWorkspace from "../components/planning/QAPlanningWorkspace";
 import PRDContextBanner from "../components/inception/PRDContextBanner";
 import CreateStoryModal from "../components/planning/CreateStoryModal";
+import { setPresence, clearPresence } from "../utils/presence";
 
 const PlanningPhasePage = () => {
   const { user } = useAuth();
   const { projects, addTask, moveTaskToSprint } = useProjects();
 
   const currentProject = projects[0];
+
+  useEffect(() => {
+    if (user && currentProject) {
+      setPresence(user, currentProject.id, "plan");
+      const interval = setInterval(
+        () => setPresence(user, currentProject.id, "plan"),
+        20000,
+      );
+      return () => {
+        clearInterval(interval);
+        clearPresence(user.id);
+      };
+    }
+  }, [user, currentProject?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const activeSprint = currentProject?.sprints?.find(
     (s) => s.status === "active",
   );

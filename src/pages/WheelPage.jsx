@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -11,6 +11,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useProjects } from "../context/ProjectContext";
 import ProjectRequirementsModal from "../components/inception/ProjectRequirementsModal";
+import { getPresence } from "../utils/presence";
 
 const phases = [
   {
@@ -93,8 +94,19 @@ const WheelPage = () => {
   const [selectedTeamMember, setSelectedTeamMember] = useState(null);
   const [pulseAnimation] = useState(true);
   const [showPRD, setShowPRD] = useState(false);
+  const [livePresence, setLivePresence] = useState(getPresence);
 
   const isPO = user?.role === "product_owner";
+
+  useEffect(() => {
+    const refresh = () => setLivePresence(getPresence());
+    const interval = setInterval(refresh, 3000);
+    window.addEventListener("agilewheel_presence_changed", refresh);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("agilewheel_presence_changed", refresh);
+    };
+  }, []);
 
   // Get project from URL params or default to first project
   const projectId = searchParams.get("project");
@@ -167,21 +179,23 @@ const WheelPage = () => {
       });
   };
 
-  // Get team members working in a phase
+  // Get team members actively working in a phase via live presence
   const getPhaseTeamMembers = (phaseId) => {
     if (!currentProject) return [];
-
-    // For demo, assign team members to phases based on their role
-    const rolePhaseMapping = {
-      product_owner: "plan",
-      scrum_master: "plan",
-      developer: "develop",
-      qa_engineer: "test",
-    };
-
-    return currentProject.team.filter(
-      (member) => rolePhaseMapping[member.role] === phaseId,
+    const inPhase = livePresence.filter(
+      (p) => p.projectId === currentProject.id && p.phase === phaseId,
     );
+    // Match presence entries to project team members by userId
+    return inPhase
+      .map(
+        (p) =>
+          currentProject.team.find((m) => m.id === p.userId) || {
+            id: p.userId,
+            name: p.userName,
+            role: p.userRole,
+          },
+      )
+      .filter(Boolean);
   };
 
   // Display phase - either hovered or current active
@@ -547,9 +561,8 @@ const WheelPage = () => {
               </defs>
             </svg>
 
-            {/* Team Presence Avatars */}
+            {/* Team Presence Avatars - live from localStorage presence */}
             {phases.map((phase, index) => {
-              if (!phase.isActive) return null;
               const teamMembers = getPhaseTeamMembers(phase.id);
               if (teamMembers.length === 0) return null;
 
@@ -569,12 +582,15 @@ const WheelPage = () => {
                   }
                 >
                   {teamMembers.slice(0, 3).map((member) => (
-                    <div
-                      key={member.id}
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white text-xs font-semibold border-2 border-white shadow-lg"
-                      title={member.name}
-                    >
-                      {member.name.charAt(0)}
+                    <div key={member.id} className="relative">
+                      <div
+                        className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white text-xs font-semibold border-2 border-white shadow-lg"
+                        title={`${member.name} — active in ${phase.name}`}
+                      >
+                        {member.name.charAt(0)}
+                      </div>
+                      {/* Live indicator dot */}
+                      <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border border-white animate-pulse" />
                     </div>
                   ))}
                   {teamMembers.length > 3 && (

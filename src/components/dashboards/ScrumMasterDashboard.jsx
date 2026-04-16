@@ -7,7 +7,10 @@ import {
   Clock,
   Plus,
   TrendingUp,
-  Target,
+  Zap,
+  BarChart3,
+  Activity,
+  Star,
 } from "lucide-react";
 import { useProjects } from "../../context/ProjectContext";
 import CreateProjectModal from "../CreateProjectModal";
@@ -54,10 +57,74 @@ const ScrumMasterDashboard = () => {
     projects.flatMap((p) => p.team.map((t) => t.email)),
   ).size;
 
+  // Story point metrics across all projects
+  const allTasks = projects.flatMap((p) => p.tasks || []);
+  const sprintTasks = allTasks.filter((t) => t.sprint);
+  const doneTasks = allTasks.filter((t) => t.status === "done");
+
+  const totalSprintPoints = sprintTasks.reduce(
+    (s, t) => s + (t.storyPoints || 0),
+    0,
+  );
+  const completedPoints = doneTasks.reduce(
+    (s, t) => s + (t.storyPoints || 0),
+    0,
+  );
+  const unestimatedCount = sprintTasks.filter((t) => !t.storyPoints).length;
+
+  // Velocity = completed points across active sprints
+  const velocityPerSprint =
+    activeSprints.length > 0
+      ? Math.round(completedPoints / Math.max(activeSprints.length, 1))
+      : completedPoints;
+
+  // Per-project capacity utilization
+  const projectMetrics = projects.map((p) => {
+    const activeSprint = (p.sprints || []).find((s) => s.status === "active");
+    const sprintStories = (p.tasks || []).filter(
+      (t) => t.sprint === activeSprint?.id,
+    );
+    const committed = sprintStories.reduce(
+      (s, t) => s + (t.storyPoints || 0),
+      0,
+    );
+    const done = sprintStories
+      .filter((t) => t.status === "done")
+      .reduce((s, t) => s + (t.storyPoints || 0), 0);
+    const capacity = 40; // default
+    const utilization =
+      capacity > 0
+        ? Math.min(Math.round((committed / capacity) * 100), 100)
+        : 0;
+    const burndownPct =
+      committed > 0 ? Math.round((done / committed) * 100) : 0;
+    return {
+      ...p,
+      committed,
+      done,
+      capacity,
+      utilization,
+      burndownPct,
+      hasSprint: !!activeSprint,
+    };
+  });
+
+  // Team health: % stories with AC + story points
+  const storiesWithAC = allTasks.filter((t) =>
+    t.acceptanceCriteria?.some((ac) => ac.text),
+  ).length;
+  const storiesWithPoints = allTasks.filter((t) => t.storyPoints).length;
+  const healthScore =
+    allTasks.length > 0
+      ? Math.round(
+          ((storiesWithAC + storiesWithPoints) / (allTasks.length * 2)) * 100,
+        )
+      : 0;
+
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
           <div className="flex items-center justify-between">
             <div>
@@ -66,6 +133,10 @@ const ScrumMasterDashboard = () => {
               </p>
               <p className="text-2xl font-bold text-slate-900 mt-1">
                 {activeSprints.length}
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                {projects.length} total project
+                {projects.length !== 1 ? "s" : ""}
               </p>
             </div>
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -77,13 +148,19 @@ const ScrumMasterDashboard = () => {
         <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-500 font-medium">Team Members</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">
-                {totalTeamMembers}
+              <p className="text-sm text-slate-500 font-medium">
+                Team Velocity
+              </p>
+              <p className="text-2xl font-bold text-blue-600 mt-1">
+                {velocityPerSprint}{" "}
+                <span className="text-sm font-normal text-slate-500">pts</span>
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                {completedPoints} pts delivered total
               </p>
             </div>
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-purple-600" />
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
@@ -94,8 +171,13 @@ const ScrumMasterDashboard = () => {
               <p className="text-sm text-slate-500 font-medium">
                 Potential Blockers
               </p>
-              <p className="text-2xl font-bold text-orange-600 mt-1">
+              <p
+                className={`text-2xl font-bold mt-1 ${potentialBlockers.length > 0 ? "text-orange-600" : "text-green-600"}`}
+              >
                 {potentialBlockers.length}
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                {unestimatedCount} unestimated in sprint
               </p>
             </div>
             <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -113,11 +195,81 @@ const ScrumMasterDashboard = () => {
               <p className="text-2xl font-bold text-green-600 mt-1">
                 {completedTasks}/{totalTasks}
               </p>
+              <p className="text-xs text-slate-400 mt-1">
+                {totalTeamMembers} team members
+              </p>
             </div>
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5 text-green-600" />
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Velocity & Story Points Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+          <div className="flex items-center gap-2 mb-1">
+            <Zap className="w-4 h-4 text-blue-600" />
+            <p className="text-xs font-semibold text-blue-700">
+              Sprint Committed
+            </p>
+          </div>
+          <p className="text-2xl font-bold text-slate-900">
+            {totalSprintPoints}{" "}
+            <span className="text-sm font-normal text-slate-500">pts</span>
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            {sprintTasks.length} stories in sprints
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+          <div className="flex items-center gap-2 mb-1">
+            <CheckCircle2 className="w-4 h-4 text-green-600" />
+            <p className="text-xs font-semibold text-green-700">Delivered</p>
+          </div>
+          <p className="text-2xl font-bold text-slate-900">
+            {completedPoints}{" "}
+            <span className="text-sm font-normal text-slate-500">pts</span>
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            {doneTasks.length} stories done
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200">
+          <div className="flex items-center gap-2 mb-1">
+            <Activity className="w-4 h-4 text-purple-600" />
+            <p className="text-xs font-semibold text-purple-700">
+              Team Health Score
+            </p>
+          </div>
+          <p className="text-2xl font-bold text-slate-900">
+            {healthScore}
+            <span className="text-sm font-normal text-slate-500">%</span>
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            AC coverage + estimation
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
+          <div className="flex items-center gap-2 mb-1">
+            <Star className="w-4 h-4 text-amber-600" />
+            <p className="text-xs font-semibold text-amber-700">
+              Stories with Points
+            </p>
+          </div>
+          <p className="text-2xl font-bold text-slate-900">
+            {storiesWithPoints}
+            <span className="text-sm font-normal text-slate-500">
+              /{allTasks.length}
+            </span>
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            {storiesWithAC} have acceptance criteria
+          </p>
         </div>
       </div>
 
@@ -291,6 +443,62 @@ const ScrumMasterDashboard = () => {
                   <CheckCircle2 className="w-8 h-8 text-green-400 mx-auto mb-2" />
                   <p className="text-sm text-slate-500">No blockers detected</p>
                 </div>
+              )}
+            </div>
+          </div>
+
+          {/* Capacity Utilization per Project */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+            <div className="p-4 border-b border-slate-200 flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-blue-600" />
+              <h2 className="text-sm font-bold text-slate-900">
+                Capacity Utilization
+              </h2>
+            </div>
+            <div className="p-4 space-y-4">
+              {projectMetrics.filter((p) => p.hasSprint).length === 0 ? (
+                <p className="text-xs text-slate-400 text-center py-4">
+                  No active sprints to measure
+                </p>
+              ) : (
+                projectMetrics
+                  .filter((p) => p.hasSprint)
+                  .map((p) => {
+                    const color =
+                      p.utilization > 100
+                        ? "bg-red-500"
+                        : p.utilization > 80
+                          ? "bg-amber-500"
+                          : "bg-green-500";
+                    return (
+                      <div key={p.id}>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="font-semibold text-slate-700 truncate max-w-[120px]">
+                            {p.name}
+                          </span>
+                          <span
+                            className={`font-bold ${p.utilization > 80 ? "text-red-600" : "text-green-600"}`}
+                          >
+                            {p.utilization}%
+                          </span>
+                        </div>
+                        <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${color} rounded-full transition-all`}
+                            style={{
+                              width: `${Math.min(p.utilization, 100)}%`,
+                            }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-xs text-slate-400 mt-0.5">
+                          <span>{p.committed} pts committed</span>
+                          <span className="text-green-600">
+                            {p.burndownPct}% burned
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
               )}
             </div>
           </div>

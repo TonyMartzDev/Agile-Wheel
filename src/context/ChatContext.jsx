@@ -143,6 +143,10 @@ export const ChatProvider = ({ children }) => {
   };
 
   const openConversation = (conversationId) => {
+    if (conversationId === null) {
+      setActiveConversation(null);
+      return;
+    }
     const conversation = conversations.find((c) => c.id === conversationId);
     if (conversation) {
       setActiveConversation(conversation);

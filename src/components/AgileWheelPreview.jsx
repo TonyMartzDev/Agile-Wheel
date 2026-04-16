@@ -57,65 +57,45 @@ const AgileWheelPreview = () => {
     setIsAnimating(true);
   };
 
+  const total = phases.length;
+
   const createArrowSegment = (index) => {
-    const segmentAngle = 60;
+    const segmentAngle = 360 / total;
     const startAngle = (index * segmentAngle - 90) * (Math.PI / 180);
     const endAngle = ((index + 1) * segmentAngle - 90) * (Math.PI / 180);
-
-    const innerRadius = 38;
+    const innerRadius = 36;
     const outerRadius = 90;
     const midRadius = (innerRadius + outerRadius) / 2;
-    const arrowDepth = 12;
-
-    const cx = 100;
-    const cy = 100;
-
-    // Start side - arrow notch pointing inward (receives previous arrow)
+    const arrowDepth = Math.min(
+      12,
+      (outerRadius - innerRadius) * 0.18 * (6 / total),
+    );
+    const cx = 100,
+      cy = 100;
+    const largeArc = segmentAngle > 180 ? 1 : 0;
     const outerStartX = cx + outerRadius * Math.cos(startAngle);
     const outerStartY = cy + outerRadius * Math.sin(startAngle);
-
-    // Notch point on start side (indentation)
     const startNotchX = cx + (midRadius + arrowDepth) * Math.cos(startAngle);
     const startNotchY = cy + (midRadius + arrowDepth) * Math.sin(startAngle);
-
     const innerStartX = cx + innerRadius * Math.cos(startAngle);
     const innerStartY = cy + innerRadius * Math.sin(startAngle);
-
-    // End side - arrow tip pointing outward
     const outerEndX = cx + outerRadius * Math.cos(endAngle);
     const outerEndY = cy + outerRadius * Math.sin(endAngle);
-
-    // Arrow tip point on end side (protrusion)
     const endTipX = cx + (midRadius - arrowDepth) * Math.cos(endAngle);
     const endTipY = cy + (midRadius - arrowDepth) * Math.sin(endAngle);
-
     const innerEndX = cx + innerRadius * Math.cos(endAngle);
     const innerEndY = cy + innerRadius * Math.sin(endAngle);
-
-    const pathData = `
-      M ${outerStartX} ${outerStartY}
-      L ${startNotchX} ${startNotchY}
-      L ${innerStartX} ${innerStartY}
-      A ${innerRadius} ${innerRadius} 0 0 1 ${innerEndX} ${innerEndY}
-      L ${endTipX} ${endTipY}
-      L ${outerEndX} ${outerEndY}
-      A ${outerRadius} ${outerRadius} 0 0 0 ${outerStartX} ${outerStartY}
-      Z
-    `;
-
-    return pathData;
+    return `M ${outerStartX} ${outerStartY} L ${startNotchX} ${startNotchY} L ${innerStartX} ${innerStartY} A ${innerRadius} ${innerRadius} 0 ${largeArc} 1 ${innerEndX} ${innerEndY} L ${endTipX} ${endTipY} L ${outerEndX} ${outerEndY} A ${outerRadius} ${outerRadius} 0 ${largeArc} 0 ${outerStartX} ${outerStartY} Z`;
   };
 
   const getTextPosition = (index) => {
-    const segmentAngle = 60;
+    const segmentAngle = 360 / total;
     const midAngle =
       (index * segmentAngle + segmentAngle / 2 - 90) * (Math.PI / 180);
-    const textRadius = 65;
-
+    const textRadius = 64;
     const x = 100 + textRadius * Math.cos(midAngle);
     const y = 100 + textRadius * Math.sin(midAngle);
     const rotation = index * segmentAngle + segmentAngle / 2;
-
     return { x, y, rotation };
   };
 
@@ -164,25 +144,64 @@ const AgileWheelPreview = () => {
             );
           })}
 
-          {/* Center Circle */}
+          {/* Center hub */}
+          <defs>
+            <radialGradient id="previewCenterRadial" cx="50%" cy="35%" r="65%">
+              <stop offset="0%" stopColor="#ffffff" />
+              <stop offset="100%" stopColor="#f1f5f9" />
+            </radialGradient>
+            <linearGradient
+              id="previewCenterGrad"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="#8b5cf6" />
+              <stop offset="100%" stopColor="#3b82f6" />
+            </linearGradient>
+          </defs>
+          <circle cx="100" cy="100" r="34" fill="#0f172a" opacity="0.06" />
           <circle
             cx="100"
             cy="100"
             r="32"
-            fill="white"
-            className="drop-shadow-lg"
+            fill="url(#previewCenterRadial)"
+            stroke="#e2e8f0"
+            strokeWidth="1.5"
+          />
+          <circle
+            cx="100"
+            cy="100"
+            r="28"
+            fill="none"
+            stroke="url(#previewCenterGrad)"
+            strokeWidth="1"
+            opacity="0.5"
           />
           <text
             x="100"
-            y="100"
-            fill="#1e293b"
-            fontSize="14"
-            fontWeight="bold"
+            y="97"
+            fill="#64748b"
+            fontSize="5.5"
+            fontWeight="600"
             textAnchor="middle"
             dominantBaseline="middle"
             className="select-none"
           >
             AGILE
+          </text>
+          <text
+            x="100"
+            y="107"
+            fill="url(#previewCenterGrad)"
+            fontSize="7"
+            fontWeight="800"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="select-none"
+          >
+            WHEEL
           </text>
         </svg>
       </div>

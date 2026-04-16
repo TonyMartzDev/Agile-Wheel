@@ -188,6 +188,44 @@ const getStoredProjects = () => {
         },
       ],
       phaseVotes: [],
+      wheelPhases: [
+        {
+          id: "plan",
+          name: "Plan",
+          color: "#7c3aed",
+          description: "Define goals, user stories, and sprints",
+        },
+        {
+          id: "design",
+          name: "Design",
+          color: "#dc2626",
+          description: "Wireframes, mockups, architecture",
+        },
+        {
+          id: "develop",
+          name: "Develop",
+          color: "#ea580c",
+          description: "Code, implement, review",
+        },
+        {
+          id: "test",
+          name: "Test",
+          color: "#0d9488",
+          description: "QA, automation, bug fixes",
+        },
+        {
+          id: "release",
+          name: "Release",
+          color: "#0369a1",
+          description: "Deploy, monitor, iterate",
+        },
+        {
+          id: "feedback",
+          name: "Feedback",
+          color: "#15803d",
+          description: "User feedback, metrics, plan",
+        },
+      ],
       createdAt: "2026-03-01T10:00:00Z",
     },
     {
@@ -257,6 +295,44 @@ const getStoredProjects = () => {
       ],
       bugs: [],
       phaseVotes: [],
+      wheelPhases: [
+        {
+          id: "plan",
+          name: "Plan",
+          color: "#7c3aed",
+          description: "Define goals, user stories, and sprints",
+        },
+        {
+          id: "design",
+          name: "Design",
+          color: "#dc2626",
+          description: "Wireframes, mockups, architecture",
+        },
+        {
+          id: "develop",
+          name: "Develop",
+          color: "#ea580c",
+          description: "Code, implement, review",
+        },
+        {
+          id: "test",
+          name: "Test",
+          color: "#0d9488",
+          description: "QA, automation, bug fixes",
+        },
+        {
+          id: "release",
+          name: "Release",
+          color: "#0369a1",
+          description: "Deploy, monitor, iterate",
+        },
+        {
+          id: "feedback",
+          name: "Feedback",
+          color: "#15803d",
+          description: "User feedback, metrics, plan",
+        },
+      ],
       createdAt: "2026-03-20T10:00:00Z",
     },
     {
@@ -392,6 +468,44 @@ const getStoredProjects = () => {
           createdAt: "2026-04-02T10:00:00Z",
         },
       ],
+      wheelPhases: [
+        {
+          id: "plan",
+          name: "Plan",
+          color: "#7c3aed",
+          description: "Define goals, user stories, and sprints",
+        },
+        {
+          id: "design",
+          name: "Design",
+          color: "#dc2626",
+          description: "Wireframes, mockups, architecture",
+        },
+        {
+          id: "develop",
+          name: "Develop",
+          color: "#ea580c",
+          description: "Code, implement, review",
+        },
+        {
+          id: "test",
+          name: "Test",
+          color: "#0d9488",
+          description: "QA, automation, bug fixes",
+        },
+        {
+          id: "release",
+          name: "Release",
+          color: "#0369a1",
+          description: "Deploy, monitor, iterate",
+        },
+        {
+          id: "feedback",
+          name: "Feedback",
+          color: "#15803d",
+          description: "User feedback, metrics, plan",
+        },
+      ],
       createdAt: "2026-03-01T10:00:00Z",
     },
   ];
@@ -412,6 +526,45 @@ export const useProjects = () => {
 export const ProjectProvider = ({ children }) => {
   const [projects, setProjects] = useState(getStoredProjects);
 
+  const DEFAULT_WHEEL_PHASES = [
+    {
+      id: crypto.randomUUID(),
+      name: "Plan",
+      color: "#7c3aed",
+      description: "Define goals, user stories, and sprints",
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Design",
+      color: "#dc2626",
+      description: "Wireframes, mockups, architecture",
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Develop",
+      color: "#ea580c",
+      description: "Code, implement, review",
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Test",
+      color: "#0d9488",
+      description: "QA, automation, bug fixes",
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Release",
+      color: "#0369a1",
+      description: "Deploy, monitor, iterate",
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Feedback",
+      color: "#15803d",
+      description: "User feedback, metrics, plan",
+    },
+  ];
+
   const createProject = (projectData) => {
     const newProject = {
       id: crypto.randomUUID(),
@@ -421,6 +574,7 @@ export const ProjectProvider = ({ children }) => {
       team: projectData.team || [],
       sprints: [],
       tasks: [],
+      wheelPhases: projectData.wheelPhases || DEFAULT_WHEEL_PHASES,
       createdAt: new Date().toISOString(),
     };
 
@@ -598,6 +752,14 @@ export const ProjectProvider = ({ children }) => {
     saveProjects(updatedProjects);
   };
 
+  const updateWheelPhases = (projectId, phases) => {
+    const updatedProjects = projects.map((p) =>
+      p.id === projectId ? { ...p, wheelPhases: phases } : p,
+    );
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
   const value = {
     projects,
     createProject,
@@ -612,6 +774,7 @@ export const ProjectProvider = ({ children }) => {
     addPhaseVote,
     savePRD,
     moveTaskToSprint,
+    updateWheelPhases,
   };
 
   return (

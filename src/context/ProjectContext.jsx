@@ -760,6 +760,227 @@ export const ProjectProvider = ({ children }) => {
     saveProjects(updatedProjects);
   };
 
+  // Development phase: add a code snippet to a task
+  const addSnippet = (projectId, taskId, snippet) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        tasks: p.tasks.map((t) => {
+          if (t.id !== taskId) return t;
+          return {
+            ...t,
+            snippets: [
+              ...(t.snippets || []),
+              {
+                id: crypto.randomUUID(),
+                ...snippet,
+                status: "draft",
+                comments: [],
+                createdAt: new Date().toISOString(),
+              },
+            ],
+          };
+        }),
+      };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
+  // Development phase: update TDD status, blocked flag, peer approval, assignee
+  const updateTaskDevFields = (projectId, taskId, fields) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        tasks: p.tasks.map((t) => (t.id === taskId ? { ...t, ...fields } : t)),
+      };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
+  // Development phase: add comment to a snippet
+  const addSnippetComment = (projectId, taskId, snippetId, comment) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        tasks: p.tasks.map((t) => {
+          if (t.id !== taskId) return t;
+          return {
+            ...t,
+            snippets: (t.snippets || []).map((s) => {
+              if (s.id !== snippetId) return s;
+              return {
+                ...s,
+                comments: [
+                  ...(s.comments || []),
+                  {
+                    id: crypto.randomUUID(),
+                    ...comment,
+                    createdAt: new Date().toISOString(),
+                  },
+                ],
+              };
+            }),
+          };
+        }),
+      };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
+  // Development phase: update snippet status (draft/reviewed/validated)
+  const updateSnippetStatus = (projectId, taskId, snippetId, status) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        tasks: p.tasks.map((t) => {
+          if (t.id !== taskId) return t;
+          return {
+            ...t,
+            snippets: (t.snippets || []).map((s) =>
+              s.id === snippetId ? { ...s, status } : s,
+            ),
+          };
+        }),
+      };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
+  // Testing phase: sync IDE test run results onto a task
+  const addTestRun = (projectId, taskId, testRun) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        tasks: p.tasks.map((t) => {
+          if (t.id !== taskId) return t;
+          const runs = [
+            ...(t.testRuns || []),
+            {
+              id: crypto.randomUUID(),
+              ...testRun,
+              createdAt: new Date().toISOString(),
+            },
+          ];
+          const passing = runs.reduce((s, r) => s + (r.passed || 0), 0);
+          const total = runs.reduce((s, r) => s + (r.total || 0), 0);
+          const coverage = total > 0 ? Math.round((passing / total) * 100) : 0;
+          return { ...t, testRuns: runs, testCoverage: coverage };
+        }),
+      };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
+  // Testing phase: promote a failed test into a Bug Story in the backlog
+  const promoteFailedTestToBug = (projectId, taskId, bugData) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      const newBug = {
+        id: crypto.randomUUID(),
+        ...bugData,
+        type: "bug",
+        status: "todo",
+        priority: bugData.priority || "critical",
+        parentStoryId: taskId,
+        createdAt: new Date().toISOString(),
+      };
+      return { ...p, tasks: [...p.tasks, newBug] };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
+  // Testing phase: update test task status (pass / fail / deferred)
+  const updateTaskTestFields = (projectId, taskId, fields) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        tasks: p.tasks.map((t) => (t.id === taskId ? { ...t, ...fields } : t)),
+      };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
+  // Testing phase: defer a bug to next sprint (Split & Spin)
+  const deferBugToNextSprint = (projectId, taskId, deferNote, poSignOff) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        tasks: p.tasks.map((t) =>
+          t.id === taskId
+            ? {
+                ...t,
+                testStatus: "deferred",
+                deferred: true,
+                deferNote,
+                poSignOff,
+                sprint: null,
+              }
+            : t,
+        ),
+      };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
+  // Testing phase: QA visual sign-off on a story
+  const signOffQAVisual = (projectId, taskId, qaUser) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        tasks: p.tasks.map((t) =>
+          t.id === taskId
+            ? { ...t, qaVisualApproved: true, qaApprovedBy: qaUser }
+            : t,
+        ),
+      };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
+  // Testing phase: add a QA Challenge (failing scenario sent from QA to dev)
+  const addQAChallenge = (projectId, taskId, challenge) => {
+    const updatedProjects = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        tasks: p.tasks.map((t) => {
+          if (t.id !== taskId) return t;
+          return {
+            ...t,
+            qaChallenges: [
+              ...(t.qaChallenges || []),
+              {
+                id: crypto.randomUUID(),
+                ...challenge,
+                status: "open",
+                createdAt: new Date().toISOString(),
+              },
+            ],
+          };
+        }),
+      };
+    });
+    setProjects(updatedProjects);
+    saveProjects(updatedProjects);
+  };
+
   const value = {
     projects,
     createProject,
@@ -775,6 +996,16 @@ export const ProjectProvider = ({ children }) => {
     savePRD,
     moveTaskToSprint,
     updateWheelPhases,
+    addSnippet,
+    updateTaskDevFields,
+    addSnippetComment,
+    updateSnippetStatus,
+    addTestRun,
+    promoteFailedTestToBug,
+    updateTaskTestFields,
+    deferBugToNextSprint,
+    signOffQAVisual,
+    addQAChallenge,
   };
 
   return (

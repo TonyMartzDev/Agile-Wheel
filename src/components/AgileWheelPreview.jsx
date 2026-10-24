@@ -95,7 +95,10 @@ const AgileWheelPreview = () => {
     const textRadius = 64;
     const x = 100 + textRadius * Math.cos(midAngle);
     const y = 100 + textRadius * Math.sin(midAngle);
-    const rotation = index * segmentAngle + segmentAngle / 2;
+    const rawRotation = index * segmentAngle + segmentAngle / 2;
+    // Flip 180° for segments in the bottom half so text is never upside-down
+    const rotation =
+      rawRotation > 90 && rawRotation < 270 ? rawRotation + 180 : rawRotation;
     return { x, y, rotation };
   };
 

@@ -203,32 +203,16 @@ const WheelPage = () => {
   const displayIssues = displayPhase ? getPhaseIssues(displayPhase.id) : [];
 
   return (
-    <div
-      className="min-h-screen flex"
-      style={{
-        background:
-          "linear-gradient(135deg, #0f0c29 0%, #302b63 40%, #24243e 100%)",
-      }}
-    >
+    <div className="min-h-screen flex bg-slate-50">
       {/* Issues Sidebar */}
-      <div
-        className="w-72 flex flex-col flex-shrink-0"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          backdropFilter: "blur(20px)",
-          borderRight: "1px solid rgba(255,255,255,0.08)",
-        }}
-      >
+      <div className="w-72 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 shadow-sm">
         {/* Sidebar header */}
-        <div
-          className="px-5 pt-5 pb-4"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-        >
+        <div className="px-5 pt-5 pb-4 border-b border-slate-100">
           <Link
             to="/dashboard"
-            className="flex items-center gap-2 text-white/50 hover:text-white/90 transition-colors group mb-5"
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors group mb-5"
           >
-            <div className="p-1.5 rounded-lg group-hover:bg-white/10 transition-colors">
+            <div className="p-1.5 rounded-lg group-hover:bg-slate-100 transition-colors">
               <ArrowLeft className="w-4 h-4" />
             </div>
             <span className="text-sm font-medium">Back to Dashboard</span>
@@ -236,25 +220,18 @@ const WheelPage = () => {
           {/* Phase badge */}
           <div className="flex items-center gap-2.5">
             <div
-              className="w-2.5 h-2.5 rounded-full shadow-lg flex-shrink-0"
-              style={{
-                backgroundColor: displayPhase.color,
-                boxShadow: `0 0 8px ${displayPhase.color}`,
-              }}
+              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: displayPhase.color }}
             />
-            <h2 className="text-base font-bold text-white/90 truncate">
+            <h2 className="text-base font-bold text-slate-900 truncate">
               {displayPhase.name}
             </h2>
             <span
               className="ml-auto text-xs px-2 py-0.5 rounded-full font-medium"
               style={{
-                background:
-                  hoveredPhase !== null
-                    ? "rgba(148,163,184,0.15)"
-                    : "rgba(139,92,246,0.2)",
-                color:
-                  hoveredPhase !== null ? "rgba(203,213,225,0.8)" : "#c4b5fd",
-                border: `1px solid ${hoveredPhase !== null ? "rgba(148,163,184,0.2)" : "rgba(139,92,246,0.3)"}`,
+                background: hoveredPhase !== null ? "#f1f5f9" : "#ede9fe",
+                color: hoveredPhase !== null ? "#64748b" : "#7c3aed",
+                border: `1px solid ${hoveredPhase !== null ? "#e2e8f0" : "#ddd6fe"}`,
               }}
             >
               {hoveredPhase !== null ? "preview" : "active"}
@@ -268,24 +245,14 @@ const WheelPage = () => {
             displayIssues.map((issue) => (
               <div
                 key={issue.id}
-                className="rounded-xl p-3.5 transition-all cursor-default group"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "rgba(255,255,255,0.09)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = "rgba(255,255,255,0.05)")
-                }
+                className="rounded-xl p-3.5 border border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default"
               >
                 <div className="flex items-start gap-2.5">
                   <div
                     className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${priorityColors[issue.priority]?.dot || "bg-slate-400"}`}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-white/80 text-sm truncate leading-snug">
+                    <p className="font-medium text-slate-800 text-sm truncate leading-snug">
                       {issue.title}
                     </p>
                     <div className="flex items-center gap-2 mt-1.5">
@@ -295,7 +262,7 @@ const WheelPage = () => {
                         {issue.priority}
                       </span>
                       {issue.assignee && (
-                        <span className="text-xs text-white/40 truncate">
+                        <span className="text-xs text-slate-400 truncate">
                           {issue.assignee}
                         </span>
                       )}
@@ -306,35 +273,26 @@ const WheelPage = () => {
             ))
           ) : (
             <div className="text-center py-10">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3"
-                style={{ background: "rgba(255,255,255,0.06)" }}
-              >
-                <CheckCircle2 className="w-6 h-6 text-white/20" />
+              <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-3">
+                <CheckCircle2 className="w-6 h-6 text-slate-300" />
               </div>
-              <p className="text-white/30 text-sm">No issues here</p>
+              <p className="text-slate-400 text-sm">No issues here</p>
             </div>
           )}
         </div>
 
         {/* Sprint Info */}
         {activeSprint && (
-          <div
-            className="p-4"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-          >
+          <div className="p-4 border-t border-slate-100">
             <div className="flex items-center justify-between text-xs mb-2.5">
-              <span className="text-white/50 font-medium">
+              <span className="text-slate-500 font-medium">
                 {activeSprint.name}
               </span>
-              <span className="text-purple-300 font-bold">
+              <span className="text-purple-600 font-bold">
                 {Math.round(sprintProgress)}%
               </span>
             </div>
-            <div
-              className="h-1.5 rounded-full overflow-hidden"
-              style={{ background: "rgba(255,255,255,0.1)" }}
-            >
+            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
@@ -348,13 +306,13 @@ const WheelPage = () => {
       </div>
 
       {/* Main Wheel Area */}
-      <div className="flex-1 flex items-center justify-center relative p-8">
+      <div className="flex-1 flex items-center justify-center relative p-8 bg-slate-50">
         {/* Project Title */}
         <div className="absolute top-6 left-6">
-          <h1 className="text-xl font-bold text-white/90">
+          <h1 className="text-xl font-bold text-slate-900">
             {currentProject?.name || "Project"}
           </h1>
-          <p className="text-white/40 text-sm mt-0.5">
+          <p className="text-slate-500 text-sm mt-0.5">
             {currentProject?.description}
           </p>
         </div>
@@ -365,29 +323,16 @@ const WheelPage = () => {
           {canCustomize && (
             <button
               onClick={() => setShowWheelBuilder(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all"
-              style={{
-                background: "rgba(255,255,255,0.1)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                color: "rgba(255,255,255,0.85)",
-                backdropFilter: "blur(8px)",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(139,92,246,0.3)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "rgba(255,255,255,0.1)")
-              }
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold hover:border-purple-300 hover:text-purple-700 hover:bg-purple-50 transition-all text-sm shadow-sm"
             >
               <Pencil className="w-4 h-4" />
               Customize Wheel
             </button>
           )}
-          {/* Project Requirements Button */}
           {isPO ? (
             <button
               onClick={() => setShowPRD(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm text-white transition-all hover:shadow-lg hover:shadow-purple-900/40"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 hover:shadow-lg"
               style={{
                 background: "linear-gradient(135deg, #7c3aed, #2563eb)",
               }}
@@ -398,18 +343,7 @@ const WheelPage = () => {
           ) : (
             <button
               onClick={() => setShowPRD(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all"
-              style={{
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                color: "rgba(255,255,255,0.75)",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(255,255,255,0.14)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "rgba(255,255,255,0.08)")
-              }
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-all text-sm shadow-sm"
             >
               <Eye className="w-4 h-4" />
               View Requirements
@@ -417,48 +351,33 @@ const WheelPage = () => {
           )}
           <Link
             to="/settings"
-            className="p-2 rounded-xl transition-colors"
-            style={{ color: "rgba(255,255,255,0.45)" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "rgba(255,255,255,0.9)";
-              e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "rgba(255,255,255,0.45)";
-              e.currentTarget.style.background = "transparent";
-            }}
+            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
             title="Settings"
           >
             <Settings className="w-5 h-5" />
           </Link>
           <div className="text-right">
-            <p className="text-sm font-semibold text-white/85">{user?.name}</p>
-            <p className="text-xs text-white/40 capitalize">
+            <p className="text-sm font-semibold text-slate-800">{user?.name}</p>
+            <p className="text-xs text-slate-400 capitalize">
               {user?.role?.replace("_", " ")}
             </p>
           </div>
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg ring-2 ring-white/20">
+          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">
             {user?.name?.charAt(0).toUpperCase() || "U"}
           </div>
         </div>
 
         {/* Project Name + Mission - positioned above wheel */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center z-10 max-w-2xl px-4 pointer-events-none">
-          <h1 className="text-3xl font-bold text-white/90 tracking-tight drop-shadow-lg">
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
             {currentProject?.name || "Project"}
           </h1>
           {currentProject?.prd?.mission ? (
-            <p
-              className="text-sm mt-2 italic font-medium"
-              style={{ color: "rgba(196,181,253,0.85)" }}
-            >
+            <p className="text-sm text-purple-600 mt-2 italic font-medium">
               &ldquo;{currentProject.prd.mission}&rdquo;
             </p>
           ) : (
-            <p
-              className="text-sm mt-2 italic"
-              style={{ color: "rgba(255,255,255,0.25)" }}
-            >
+            <p className="text-sm text-slate-400 mt-2 italic">
               {isPO
                 ? 'Open "Project Requirements" to define the mission'
                 : "No mission defined yet"}
@@ -535,6 +454,60 @@ const WheelPage = () => {
               viewBox="0 0 200 200"
             >
               <defs>
+                {/* Per-segment radial gradients — lighter at inner edge, richer at outer */}
+                {phases.map((phase, index) => {
+                  const midAngle =
+                    (((index * 360) / phases.length +
+                      180 / phases.length -
+                      90) *
+                      Math.PI) /
+                    180;
+                  const gx = 100 + 63 * Math.cos(midAngle);
+                  const gy = 100 + 63 * Math.sin(midAngle);
+                  return (
+                    <radialGradient
+                      key={`grad-${phase.id || index}`}
+                      id={`segGrad-${index}`}
+                      gradientUnits="userSpaceOnUse"
+                      cx={gx}
+                      cy={gy}
+                      r="60"
+                      fx={gx}
+                      fy={gy}
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor={phase.color}
+                        stopOpacity="1"
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor={phase.color}
+                        stopOpacity="0.52"
+                      />
+                    </radialGradient>
+                  );
+                })}
+                {/* Hover highlight overlay gradient */}
+                <radialGradient id="hoverSheen" cx="50%" cy="30%" r="60%">
+                  <stop offset="0%" stopColor="#ffffff" stopOpacity="0.18" />
+                  <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                </radialGradient>
+                {/* Filters */}
+                <filter
+                  id="segShadow"
+                  x="-20%"
+                  y="-20%"
+                  width="140%"
+                  height="140%"
+                >
+                  <feDropShadow
+                    dx="0"
+                    dy="2"
+                    stdDeviation="2"
+                    floodColor="rgba(0,0,0,0.18)"
+                  />
+                </filter>
                 <filter
                   id="segGlow"
                   x="-30%"
@@ -542,7 +515,7 @@ const WheelPage = () => {
                   width="160%"
                   height="160%"
                 >
-                  <feGaussianBlur stdDeviation="2.5" result="blur" />
+                  <feGaussianBlur stdDeviation="3" result="blur" />
                   <feMerge>
                     <feMergeNode in="blur" />
                     <feMergeNode in="SourceGraphic" />
@@ -555,13 +528,19 @@ const WheelPage = () => {
                   width="180%"
                   height="180%"
                 >
-                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feGaussianBlur stdDeviation="5" result="blur" />
                   <feMerge>
                     <feMergeNode in="blur" />
                     <feMergeNode in="blur" />
                     <feMergeNode in="SourceGraphic" />
                   </feMerge>
                 </filter>
+                {/* Center hub gradients */}
+                <radialGradient id="hubGlow" cx="50%" cy="40%" r="60%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="60%" stopColor="#f8fafc" />
+                  <stop offset="100%" stopColor="#f1f5f9" />
+                </radialGradient>
                 <linearGradient
                   id="centerGradient"
                   x1="0%"
@@ -569,13 +548,23 @@ const WheelPage = () => {
                   x2="100%"
                   y2="100%"
                 >
-                  <stop offset="0%" stopColor="#8b5cf6" />
-                  <stop offset="100%" stopColor="#3b82f6" />
+                  <stop offset="0%" stopColor="#7c3aed" />
+                  <stop offset="100%" stopColor="#2563eb" />
                 </linearGradient>
-                <radialGradient id="centerRadial" cx="50%" cy="35%" r="65%">
-                  <stop offset="0%" stopColor="#ffffff" />
-                  <stop offset="100%" stopColor="#f1f5f9" />
-                </radialGradient>
+                <filter
+                  id="hubShadow"
+                  x="-30%"
+                  y="-30%"
+                  width="160%"
+                  height="160%"
+                >
+                  <feDropShadow
+                    dx="0"
+                    dy="0"
+                    stdDeviation="6"
+                    floodColor="rgba(124,58,237,0.25)"
+                  />
+                </filter>
               </defs>
 
               {/* Segments */}
@@ -583,39 +572,56 @@ const WheelPage = () => {
                 const isCurrentPhase = index === currentPhaseIndex;
                 const isHovered = hoveredPhase === index;
                 const isLocked = index > currentPhaseIndex;
+                const isCompleted = index < currentPhaseIndex;
                 const pos = getTextPosition(index, phases.length);
+                const segPath = createArrowSegment(index, phases.length);
 
                 return (
                   <g key={phase.id || index}>
-                    {/* Shadow/depth layer */}
+                    {/* Drop shadow layer */}
                     <path
-                      d={createArrowSegment(index, phases.length)}
-                      fill="#000"
-                      opacity="0.08"
-                      transform="translate(1,2)"
+                      d={segPath}
+                      fill="transparent"
+                      filter="url(#segShadow)"
                     />
+                    {/* Main segment fill — radial gradient */}
                     <path
-                      d={createArrowSegment(index, phases.length)}
-                      fill={isLocked ? "#94a3b8" : phase.color}
+                      d={segPath}
+                      fill={isLocked ? "#cbd5e1" : `url(#segGrad-${index})`}
                       opacity={
                         isLocked
-                          ? 0.35
+                          ? 0.5
                           : isHovered
                             ? 1
                             : isCurrentPhase
-                              ? 0.95
-                              : 0.82
+                              ? 1
+                              : isCompleted
+                                ? 0.75
+                                : 0.88
                       }
                       className={`transition-all duration-200 ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}
                       onMouseEnter={() => !isLocked && setHoveredPhase(index)}
                       onClick={() => {
                         if (isLocked) return;
                         const phaseNameLower = phase.name.toLowerCase();
-                        if (phaseNameLower === "plan") {
+                        if (phaseNameLower === "plan")
                           navigate(`/planning?project=${currentProject?.id}`);
-                        } else if (phaseNameLower === "design") {
+                        else if (phaseNameLower === "design")
                           navigate(`/design?project=${currentProject?.id}`);
-                        }
+                        else if (
+                          phaseNameLower === "test" ||
+                          phaseNameLower === "testing" ||
+                          phaseNameLower === "qa"
+                        )
+                          navigate(`/testing?project=${currentProject?.id}`);
+                        else if (
+                          phaseNameLower === "develop" ||
+                          phaseNameLower === "development" ||
+                          phaseNameLower === "build"
+                        )
+                          navigate(
+                            `/development?project=${currentProject?.id}`,
+                          );
                       }}
                       filter={
                         isCurrentPhase && pulseAnimation
@@ -629,9 +635,24 @@ const WheelPage = () => {
                           isCurrentPhase && pulseAnimation
                             ? "pulse 2.5s ease-in-out infinite"
                             : "none",
-                        strokeWidth: isHovered ? "0.5" : "0",
-                        stroke: isHovered ? "white" : "none",
                       }}
+                    />
+                    {/* Sheen overlay on hover/active — gives glossy feel */}
+                    {(isHovered || isCurrentPhase) && !isLocked && (
+                      <path
+                        d={segPath}
+                        fill="url(#hoverSheen)"
+                        className="pointer-events-none"
+                      />
+                    )}
+                    {/* Thin separator stroke between segments */}
+                    <path
+                      d={segPath}
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      opacity="0.35"
+                      className="pointer-events-none"
                     />
                     {/* Phase name */}
                     <text
@@ -650,15 +671,16 @@ const WheelPage = () => {
                       dominantBaseline="middle"
                       className="pointer-events-none select-none"
                       style={{
-                        textShadow: isLocked
+                        filter: isLocked
                           ? "none"
-                          : "0 1px 3px rgba(0,0,0,0.4)",
-                        letterSpacing: "0.02em",
+                          : "drop-shadow(0 1px 2px rgba(0,0,0,0.45))",
+                        letterSpacing: "0.04em",
                       }}
                       transform={`rotate(${pos.rotation}, ${pos.x}, ${pos.y})`}
                     >
                       {phase.name}
                     </text>
+                    {/* Lock icon for future phases */}
                     {isLocked && (
                       <text
                         x={pos.x}
@@ -677,16 +699,28 @@ const WheelPage = () => {
                 );
               })}
 
-              {/* Center hub — modern layered design */}
-              <circle cx="100" cy="100" r="34" fill="#0f172a" opacity="0.06" />
+              {/* Center hub */}
+              {/* Outer glow ring */}
               <circle
                 cx="100"
                 cy="100"
-                r="32"
-                fill="url(#centerRadial)"
-                stroke="#e2e8f0"
-                strokeWidth="1.5"
+                r="35"
+                fill="none"
+                stroke="url(#centerGradient)"
+                strokeWidth="0.75"
+                opacity="0.4"
               />
+              {/* Hub body */}
+              <circle
+                cx="100"
+                cy="100"
+                r="33"
+                fill="url(#hubGlow)"
+                filter="url(#hubShadow)"
+                stroke="#e2e8f0"
+                strokeWidth="1"
+              />
+              {/* Inner accent ring */}
               <circle
                 cx="100"
                 cy="100"
@@ -694,27 +728,28 @@ const WheelPage = () => {
                 fill="none"
                 stroke="url(#centerGradient)"
                 strokeWidth="1"
-                opacity="0.4"
+                opacity="0.25"
               />
               {currentProject && (
                 <>
                   <text
                     x="100"
-                    y="95"
-                    fill="#64748b"
-                    fontSize="5"
-                    fontWeight="600"
+                    y="94"
+                    fill="#94a3b8"
+                    fontSize="4.5"
+                    fontWeight="700"
                     textAnchor="middle"
                     dominantBaseline="middle"
                     className="select-none"
+                    style={{ letterSpacing: "0.12em" }}
                   >
                     {currentProject.phase?.toUpperCase()}
                   </text>
                   <text
                     x="100"
-                    y="106"
+                    y="105"
                     fill="url(#centerGradient)"
-                    fontSize="10"
+                    fontSize="11"
                     fontWeight="800"
                     textAnchor="middle"
                     dominantBaseline="middle"
@@ -945,7 +980,10 @@ function getTextPosition(index, total) {
   const textRadius = 64;
   const x = 100 + textRadius * Math.cos(midAngle);
   const y = 100 + textRadius * Math.sin(midAngle);
-  const rotation = index * segmentAngle + segmentAngle / 2;
+  const rawRotation = index * segmentAngle + segmentAngle / 2;
+  // Flip 180° for segments in the bottom half so text is never upside-down
+  const rotation =
+    rawRotation > 90 && rawRotation < 270 ? rawRotation + 180 : rawRotation;
   return { x, y, rotation };
 }
 

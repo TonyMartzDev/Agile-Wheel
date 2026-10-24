@@ -8,6 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import WheelPage from "./pages/WheelPage";
 import PlanningPhasePage from "./pages/PlanningPhasePage";
 import DesignPhasePage from "./pages/DesignPhasePage";
+import DevelopmentPhasePage from "./pages/DevelopmentPhasePage";
+import TestingPhasePage from "./pages/TestingPhasePage";
 import SettingsPage from "./pages/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ChatWindow from "./components/ChatWindow";
@@ -50,6 +52,22 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <DesignPhasePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/development"
+                element={
+                  <ProtectedRoute>
+                    <DevelopmentPhasePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/testing"
+                element={
+                  <ProtectedRoute>
+                    <TestingPhasePage />
                   </ProtectedRoute>
                 }
               />
